@@ -71,7 +71,9 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\BuyAndHoldStrategies.vb" />
     <Compile Include="Code\Stock.vb" />
+    <Compile Include="Code\StrategyResult.vb" />
     <Compile Include="Program.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

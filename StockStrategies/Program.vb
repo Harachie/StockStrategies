@@ -7,6 +7,7 @@ Module Program
     Sub Main()
         Dim dax As List(Of Stock) = LoadDax()
 
+        BuyAndHoldStrategies.InvestConstantly(dax(1), 10000, 1200)
     End Sub
 
     Public Function Normalize(json As String) As String
