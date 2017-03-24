@@ -5,10 +5,7 @@ Imports Newtonsoft.Json.Linq
 Module Program
 
     Sub Main()
-        Dim json As String = IO.File.ReadAllText(IO.Path.Combine(IO.Directory.GetCurrentDirectory, "Data", "dax formated.json"))
-        Dim normalized As String = Normalize(json)
-        Dim raw As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, String))) = JsonConvert.DeserializeObject(Of Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, String))))(normalized)
-        Dim semiRaw As Dictionary(Of String, Stock) = JsonConvert.DeserializeObject(Of Dictionary(Of String, Stock))(normalized)
+        Dim dax As List(Of Stock) = LoadDax()
 
     End Sub
 
@@ -16,8 +13,39 @@ Module Program
         Return Regex.Replace(json, "(\d+),(\d+)", "$1.$2")
     End Function
 
-    Public Function LoadDax() As Object
+    Public Function LoadNormalized(filePath As String) As String
+        Dim fileNameWithoutExtension As String = IO.Path.GetFileNameWithoutExtension(filePath)
+        Dim normalizedFileName As String = fileNameWithoutExtension & "_normalized" & IO.Path.GetExtension(filePath)
+        Dim directoy As String = IO.Path.GetDirectoryName(filePath)
+        Dim normalizedFilePath As String = IO.Path.Combine(directoy, normalizedFileName)
+        Dim content As String
 
+        If IO.File.Exists(normalizedFilePath) Then
+            Return IO.File.ReadAllText(normalizedFilePath)
+        End If
+
+        content = IO.File.ReadAllText(filePath)
+        content = Normalize(content)
+        IO.File.WriteAllText(normalizedFilePath, content)
+
+        Return content
+    End Function
+
+    Public Function LoadStocks(filePath As String) As List(Of Stock)
+        Dim r As New List(Of Stock)
+        Dim json As String = LoadNormalized(filePath)
+        Dim semiRaw As Dictionary(Of String, Stock) = JsonConvert.DeserializeObject(Of Dictionary(Of String, Stock))(json)
+
+        For Each kv In semiRaw
+            kv.Value.Name = kv.Key
+            r.Add(kv.Value)
+        Next
+
+        Return r
+    End Function
+
+    Public Function LoadDax() As List(Of Stock)
+        Return LoadStocks(IO.Path.Combine(IO.Directory.GetCurrentDirectory, "Data", "dax formated.json"))
     End Function
 
 End Module
