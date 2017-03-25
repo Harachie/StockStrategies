@@ -1,6 +1,6 @@
 ﻿Imports Newtonsoft.Json
 
-Public Class Stock
+Public Class StockFundamentals
 
     Public Property Name As String
 

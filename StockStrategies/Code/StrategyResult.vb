@@ -1,6 +1,6 @@
 ﻿Public Class StrategyResult
 
-    Public Property Stock As Stock
+    Public Property Stock As StockFundamentals
     Public Property StartCaptial As Double
     Public Property YearlyInvestment As Double
     Public Property StockAmount As Double

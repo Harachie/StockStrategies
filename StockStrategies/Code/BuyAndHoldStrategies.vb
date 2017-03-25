@@ -3,7 +3,7 @@
     Public Const TAX_FREE_MULTIPLIER As Double = 0.73625
     Public Const TAX_FREE_AMOUNT As Double = 801.0
 
-    Public Shared Function InvestConstantly(stock As Stock, startCapital As Double, moneyPerMonth As Double) As StrategyResult
+    Public Shared Function InvestConstantly(stock As StockFundamentals, startCapital As Double, moneyPerMonth As Double) As StrategyResult
         Dim r As New StrategyResult
         Dim dividendsBeforeTax, dividendsAfterTax, addedStockAmount As Double
 

@@ -72,7 +72,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Code\BuyAndHoldStrategies.vb" />
-    <Compile Include="Code\Stock.vb" />
+    <Compile Include="Code\DividendsHistory.vb" />
+    <Compile Include="Code\StockFundamentals.vb" />
+    <Compile Include="Code\StockData.vb" />
     <Compile Include="Code\StrategyResult.vb" />
     <Compile Include="Program.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -100,7 +102,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\dividens\daimler.json" />
+    <None Include="Data\dividends\daimler.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Data\dax formated.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -120,7 +124,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Data\xetra\dai.de.txt" />
+    <Content Include="Data\xetra\dai.de.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

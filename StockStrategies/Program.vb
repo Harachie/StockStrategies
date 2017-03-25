@@ -5,8 +5,10 @@ Imports Newtonsoft.Json.Linq
 Module Program
 
     Sub Main()
-        Dim dax As List(Of Stock) = LoadDax()
+        Dim dax As List(Of StockFundamentals) = LoadDax()
+        Dim daimlerDividends As DividendsHistory
 
+        daimlerDividends = DividendsHistory.ReadFromFile(IO.Path.Combine(IO.Directory.GetCurrentDirectory(), "Data", "dividends", "daimler.json"))
         BuyAndHoldStrategies.InvestConstantly(dax(27), 10000, 1200)
     End Sub
 
@@ -32,10 +34,10 @@ Module Program
         Return content
     End Function
 
-    Public Function LoadStocks(filePath As String) As List(Of Stock)
-        Dim r As New List(Of Stock)
+    Public Function LoadStocks(filePath As String) As List(Of StockFundamentals)
+        Dim r As New List(Of StockFundamentals)
         Dim json As String = LoadNormalized(filePath)
-        Dim semiRaw As Dictionary(Of String, Stock) = JsonConvert.DeserializeObject(Of Dictionary(Of String, Stock))(json)
+        Dim semiRaw As Dictionary(Of String, StockFundamentals) = JsonConvert.DeserializeObject(Of Dictionary(Of String, StockFundamentals))(json)
 
         For Each kv In semiRaw
             kv.Value.Name = kv.Key
@@ -45,7 +47,7 @@ Module Program
         Return r
     End Function
 
-    Public Function LoadDax() As List(Of Stock)
+    Public Function LoadDax() As List(Of StockFundamentals)
         Return LoadStocks(IO.Path.Combine(IO.Directory.GetCurrentDirectory, "Data", "dax formated.json"))
     End Function
 
