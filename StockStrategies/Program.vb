@@ -7,8 +7,10 @@ Module Program
     Sub Main()
         Dim dax As List(Of StockFundamentals) = LoadDax()
         Dim daimlerDividends As DividendsHistory
+        Dim daimler As Stock
 
-        daimlerDividends = DividendsHistory.ReadFromFile(IO.Path.Combine(IO.Directory.GetCurrentDirectory(), "Data", "dividends", "daimler.json"))
+        daimler = Stock.ReadFromFile(IO.Path.Combine(GetXetraDirectory, "dai.de.txt"))
+        daimler.Dividends = DividendsHistory.ReadFromFile(IO.Path.Combine(IO.Directory.GetCurrentDirectory(), "Data", "dividends", "daimler.json"))
         BuyAndHoldStrategies.InvestConstantly(dax(27), 10000, 1200)
     End Sub
 

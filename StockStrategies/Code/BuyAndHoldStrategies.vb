@@ -3,20 +3,20 @@
     Public Const TAX_FREE_MULTIPLIER As Double = 0.73625
     Public Const TAX_FREE_AMOUNT As Double = 801.0
 
-    Public Shared Function InvestConstantly(stock As StockFundamentals, startCapital As Double, moneyPerMonth As Double) As StrategyResult
+    Public Shared Function InvestConstantly(fundamentals As StockFundamentals, startCapital As Double, moneyPerMonth As Double) As StrategyResult
         Dim r As New StrategyResult
         Dim dividendsBeforeTax, dividendsAfterTax, addedStockAmount As Double
 
-        r.Stock = stock
+        r.StockFundamentals = fundamentals
         r.YearlyInvestment = moneyPerMonth * 12.0
         r.StartCaptial = startCapital
         r.Invested = r.StartCaptial
 
-        If stock.Dividends.Count > 0 Then
-            r.StockAmount = startCapital / stock.StockValues(stock.Dividends.Keys(0))
+        If fundamentals.Dividends.Count > 0 Then
+            r.StockAmount = startCapital / fundamentals.StockValues(fundamentals.Dividends.Keys(0))
         End If
 
-        For Each kv In stock.Dividends
+        For Each kv In fundamentals.Dividends
             dividendsBeforeTax = r.StockAmount * kv.Value
 
             If dividendsBeforeTax > TAX_FREE_AMOUNT Then
@@ -28,11 +28,11 @@
 
             r.GainedDividends += dividendsAfterTax
 
-            addedStockAmount = dividendsAfterTax / stock.StockValues(kv.Key)
+            addedStockAmount = dividendsAfterTax / fundamentals.StockValues(kv.Key)
             r.StockAmount += addedStockAmount
 
             r.Invested += r.YearlyInvestment
-            addedStockAmount = r.YearlyInvestment / stock.StockValues(kv.Key)
+            addedStockAmount = r.YearlyInvestment / fundamentals.StockValues(kv.Key)
             r.StockAmount += addedStockAmount
         Next
 
