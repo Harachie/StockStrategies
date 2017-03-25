@@ -1,21 +1,20 @@
 ﻿Public Class Stock
 
     Public Property Name As String
-    Public Property Data As New List(Of StockData)
-    Public Property Dividends As DividendsHistory
+    Public Property Data As StockDataCollection
+    Public Property DividendsHistory As DividendsHistory
 
-    Public Shared Function ReadFromFile(filePath As String) As Stock
+    Public ReadOnly Property HasDividends As Boolean
+        Get
+            Return Me.DividendsHistory IsNot Nothing AndAlso Me.DividendsHistory.Dividends IsNot Nothing AndAlso Me.DividendsHistory.Dividends.Count > 0
+        End Get
+    End Property
+
+    Public Shared Function ReadFromFile(dataFilePath As String, dividendsFilePath As String) As Stock
         Dim r As New Stock
-        Dim line As String
 
-        Using reader As New IO.StreamReader(IO.File.OpenRead(filePath))
-            reader.ReadLine()
-
-            While Not reader.EndOfStream
-                line = reader.ReadLine
-                r.Data.Add(StockData.FromLine(line))
-            End While
-        End Using
+        r.Data = StockDataCollection.ReadFromFile(dataFilePath)
+        r.DividendsHistory = DividendsHistory.ReadFromFile(dividendsFilePath)
 
         Return r
     End Function

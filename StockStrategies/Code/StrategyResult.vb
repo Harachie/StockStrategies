@@ -10,4 +10,12 @@
     Public Property CurrentInvestmentValue As Double
     Public Property Log As New List(Of String)
 
+    Public Sub AddLogEntry(message As String)
+        Me.Log.Add(message)
+    End Sub
+
+    Public Sub AddLogEntry(format As String, ParamArray args() As Object)
+        Me.Log.Add(String.Format(format, args))
+    End Sub
+
 End Class

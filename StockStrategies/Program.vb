@@ -6,12 +6,13 @@ Module Program
 
     Sub Main()
         Dim dax As List(Of StockFundamentals) = LoadDax()
-        Dim daimlerDividends As DividendsHistory
-        Dim daimler As Stock
+        Dim invest As New InvestMonthlyStrategy
 
-        daimler = Stock.ReadFromFile(IO.Path.Combine(GetXetraDirectory, "dai.de.txt"))
-        daimler.Dividends = DividendsHistory.ReadFromFile(IO.Path.Combine(IO.Directory.GetCurrentDirectory(), "Data", "dividends", "daimler.json"))
-        BuyAndHoldStrategies.InvestConstantly(dax(27), 10000, 1200)
+        Dim daimler = Stock.ReadFromFile(IO.Path.Combine(GetXetraDirectory(), "dai.de.txt"), IO.Path.Combine(IO.Directory.GetCurrentDirectory(), "Data", "dividends", "daimler.json"))
+        Dim basf = Stock.ReadFromFile(IO.Path.Combine(GetXetraDirectory(), "bas.de.txt"), IO.Path.Combine(IO.Directory.GetCurrentDirectory(), "Data", "dividends", "basf.json"))
+
+        Dim resultDaimler = invest.ReinvestDividends(daimler, 10000, 600)
+        Dim resultBasf = invest.ReinvestDividends(basf, 10000, 600)
     End Sub
 
     Public Function Normalize(json As String) As String
