@@ -13,9 +13,12 @@ Public Class DividendsHistory
         Return r
     End Function
 
+    Public Sub Save(filePath As String)
+        WriteAllText(filePath, JsonConvert.SerializeObject(Me))
+    End Sub
+
     Public Class Dividend
 
-        <JsonProperty("Jahr")> Public Property Year As Integer
         <JsonProperty("Datum")> Public Property DistributionDate As Date
         <JsonProperty("Betrag")> Public Property Amount As Double
 
