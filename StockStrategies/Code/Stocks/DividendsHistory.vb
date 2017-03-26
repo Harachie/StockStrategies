@@ -13,8 +13,8 @@ Public Class DividendsHistory
         Return r
     End Function
 
-    Public Sub Save(filePath As String)
-        WriteAllText(filePath, JsonConvert.SerializeObject(Me))
+    Public Sub Save(fileName As String)
+        WriteAllText(IO.Path.Combine(GetDividendsDirectory(), fileName), JsonConvert.SerializeObject(Me))
     End Sub
 
     Public Class Dividend

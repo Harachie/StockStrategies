@@ -75,15 +75,16 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Code\BuyAndHoldStrategies.vb" />
-    <Compile Include="Code\DividendsHistory.vb" />
+    <Compile Include="Code\Stocks\StockMetaData.vb" />
+    <Compile Include="Code\Strategies\BuyAndHoldStrategies.vb" />
+    <Compile Include="Code\Stocks\DividendsHistory.vb" />
     <Compile Include="Code\Scraper\ArivaDividendsScraper.vb" />
-    <Compile Include="Code\Stock.vb" />
-    <Compile Include="Code\StockDataCollection.vb" />
-    <Compile Include="Code\StockFundamentals.vb" />
-    <Compile Include="Code\StockData.vb" />
+    <Compile Include="Code\Stocks\Stock.vb" />
+    <Compile Include="Code\Stocks\StockDataCollection.vb" />
+    <Compile Include="Code\Stocks\StockFundamentals.vb" />
+    <Compile Include="Code\Stocks\StockData.vb" />
     <Compile Include="Code\Strategies\InvestMonthlyStrategy.vb" />
-    <Compile Include="Code\StrategyResult.vb" />
+    <Compile Include="Code\Strategies\StrategyResult.vb" />
     <Compile Include="Code\Tools.vb" />
     <Compile Include="Code\Web\Downloader.vb" />
     <Compile Include="Program.vb" />
@@ -119,6 +120,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Data\dax formated.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\meta\basf.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Data\meta\bmw.json">

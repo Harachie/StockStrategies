@@ -13,7 +13,8 @@
         r.Invested = r.StartCaptial
 
         If stock.HasDividends Then
-            dividends = stock.DividendsHistory.Dividends(0)
+            dividends = stock.DividendsHistory.Dividends.Where(Function(d) d.DistributionDate >= startDate).FirstOrDefault
+            dividendsIndex = stock.DividendsHistory.Dividends.IndexOf(dividends)
         End If
 
         currentStockData = stock.Data.Where(Function(d) d.Date >= startDate).First

@@ -1,5 +1,6 @@
 ﻿{
-  "Name": "BMW",
-  "ArivaName": "bmw",
-  "DataFileName": "bmw.de.txt"
+  "Name": "Daimler",
+  "ArivaName": "daimler",
+  "DividendsFileName": "daimler.json",
+  "DataFileName": "dai.de.txt"
 }
