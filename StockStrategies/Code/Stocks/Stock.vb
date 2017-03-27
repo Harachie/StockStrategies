@@ -6,7 +6,7 @@
 
     Public ReadOnly Property HasDividends As Boolean
         Get
-            Return Me.DividendsHistory IsNot Nothing AndAlso Me.DividendsHistory.Dividends IsNot Nothing AndAlso Me.DividendsHistory.Dividends.Count > 0
+            Return Me.DividendsHistory IsNot Nothing AndAlso Me.DividendsHistory.Count > 0
         End Get
     End Property
 

@@ -21,8 +21,6 @@
         Dim datum As Date
         Dim history As New DividendsHistory
 
-        history.Dividends = New List(Of DividendsHistory.Dividend)
-
         For Each rowX As XElement In xml.Elements.Skip(1)
             counter = 0
             isDividende = False
@@ -43,11 +41,11 @@
             Next
 
             If isDividende Then
-                history.Dividends.Add(New DividendsHistory.Dividend With {.Amount = dividends, .DistributionDate = datum})
+                history.Add(New Dividend With {.Amount = dividends, .DistributionDate = datum})
             End If
         Next
 
-        history.Dividends.Reverse()
+        history.Reverse()
 
         Return history
     End Function

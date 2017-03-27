@@ -4,7 +4,7 @@
         Dim r As New StrategyResult
         Dim dividendsBeforeTax, dividendsAfterTax, dividendsMoney, addedStockAmount As Double
         Dim dividendsIndex, currentMonth As Integer
-        Dim dividends As DividendsHistory.Dividend = Nothing
+        Dim dividends As Dividend = Nothing
         Dim currentStockData As StockData = Nothing
         Dim startDate As Date = DateSerial(2000, 1, 1)
 
@@ -13,8 +13,8 @@
         r.Invested = r.StartCaptial
 
         If stock.HasDividends Then
-            dividends = stock.DividendsHistory.Dividends.Where(Function(d) d.DistributionDate >= startDate).FirstOrDefault
-            dividendsIndex = stock.DividendsHistory.Dividends.IndexOf(dividends)
+            dividends = stock.DividendsHistory.Where(Function(d) d.DistributionDate >= startDate).FirstOrDefault
+            dividendsIndex = stock.DividendsHistory.IndexOf(dividends)
         End If
 
         currentStockData = stock.Data.Where(Function(d) d.Date >= startDate).First
@@ -57,8 +57,8 @@
                 r.GainedDividends += dividendsAfterTax
                 dividendsMoney = dividendsAfterTax
 
-                If stock.DividendsHistory.Dividends.Count > dividendsIndex Then
-                    dividends = stock.DividendsHistory.Dividends(dividendsIndex)
+                If stock.DividendsHistory.Count > dividendsIndex Then
+                    dividends = stock.DividendsHistory(dividendsIndex)
                 Else
                     dividends = Nothing
                 End If
@@ -74,7 +74,7 @@
         Dim r As New StrategyResult
         Dim dividendsBeforeTax, dividendsAfterTax, dividendsMoney, addedStockAmount As Double
         Dim dividendsIndex, currentMonth, evenCounter As Integer
-        Dim dividends As DividendsHistory.Dividend = Nothing
+        Dim dividends As Dividend = Nothing
         Dim currentStockData As StockData = Nothing
         Dim monthlyInvestment As Double = moneyPerMonth
 
@@ -83,7 +83,7 @@
         r.Invested = r.StartCaptial
 
         If stock.HasDividends Then
-            dividends = stock.DividendsHistory.Dividends(0)
+            dividends = stock.DividendsHistory(0)
         End If
 
         currentMonth = stock.Data(0).Date.Month
@@ -130,8 +130,8 @@
                 dividendsMoney = (dividendsMoney * evenCounter + dividendsAfterTax) / 12.0
                 evenCounter = 12
 
-                If stock.DividendsHistory.Dividends.Count > dividendsIndex Then
-                    dividends = stock.DividendsHistory.Dividends(dividendsIndex)
+                If stock.DividendsHistory.Count > dividendsIndex Then
+                    dividends = stock.DividendsHistory(dividendsIndex)
                 Else
                     dividends = Nothing
                 End If
