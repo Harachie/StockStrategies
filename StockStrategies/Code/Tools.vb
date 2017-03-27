@@ -9,6 +9,20 @@ Public Module Tools
         IO.File.WriteAllText(filePath, content, New Text.UTF8Encoding(False))
     End Sub
 
+    Public Sub CreateAllDirectories()
+        CreateDirectoryIfNotExists(GetXetraDirectory())
+        CreateDirectoryIfNotExists(GetDividendsDirectory())
+        CreateDirectoryIfNotExists(GetMetaDirectory())
+        CreateDirectoryIfNotExists(GetCollectionsDirectory())
+        CreateDirectoryIfNotExists(GetCacheDirectory())
+    End Sub
+
+    Public Sub CreateDirectoryIfNotExists(directoryPath As String)
+        If Not IO.Directory.Exists(directoryPath) Then
+            IO.Directory.CreateDirectory(directoryPath)
+        End If
+    End Sub
+
     Public Function GetXetraDirectory() As String
         Return IO.Path.Combine(IO.Directory.GetCurrentDirectory, "Data", "xetra")
     End Function

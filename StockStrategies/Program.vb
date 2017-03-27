@@ -9,9 +9,12 @@ Module Program
         Dim invest As New InvestMonthlyStrategy
         Dim loader As New Downloader
 
+        CreateAllDirectories()
+
         Dim daimler = Stock.ReadFromFile(IO.Path.Combine(GetXetraDirectory(), "dai.de.txt"), IO.Path.Combine(IO.Directory.GetCurrentDirectory(), "Data", "dividends", "daimler.json"))
         Dim basf = Stock.ReadFromFile(IO.Path.Combine(GetXetraDirectory(), "bas.de.txt"), IO.Path.Combine(IO.Directory.GetCurrentDirectory(), "Data", "dividends", "basf.json"))
         Dim bmw As Stock = Stock.ReadFromMetaData("bmw.json")
+        Dim metac As StockMetaDataCollection = StockMetaDataCollection.ReadFromFile("german.json")
 
         Dim resultDaimler = invest.ReinvestDividends(daimler, 10000, 600)
         Dim resultBasf = invest.ReinvestDividends(basf, 10000, 600)
