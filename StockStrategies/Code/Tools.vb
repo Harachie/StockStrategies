@@ -15,6 +15,7 @@ Public Module Tools
         CreateDirectoryIfNotExists(GetMetaDirectory())
         CreateDirectoryIfNotExists(GetCollectionsDirectory())
         CreateDirectoryIfNotExists(GetCacheDirectory())
+        CreateDirectoryIfNotExists(GetStooqDirectory())
     End Sub
 
     Public Sub CreateDirectoryIfNotExists(directoryPath As String)
@@ -22,6 +23,10 @@ Public Module Tools
             IO.Directory.CreateDirectory(directoryPath)
         End If
     End Sub
+
+    Public Function GetStooqDirectory() As String
+        Return IO.Path.Combine(IO.Directory.GetCurrentDirectory, "Data", "stooq")
+    End Function
 
     Public Function GetXetraDirectory() As String
         Return IO.Path.Combine(IO.Directory.GetCurrentDirectory, "Data", "xetra")

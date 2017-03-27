@@ -4,6 +4,7 @@ Public Class StockMetaData
 
     Public Property Name As String
     Public Property ArivaName As String
+    Public Property StooqTicker As String
     Public Property DividendsFileName As String
     Public Property DataFileName As String
 

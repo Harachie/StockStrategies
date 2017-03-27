@@ -4,6 +4,14 @@
         Return DownloadCachedMonthly(String.Format("http://www.ariva.de/{0}-aktie/historische_ereignisse?clean_split=1", arrivaStockName))
     End Function
 
+    Public Function DownloadStooqData(meta As StockMetaData) As String
+        Return DownloadStooqData(meta.StooqTicker)
+    End Function
+
+    Public Function DownloadStooqData(stooqTicker As String) As String 'https://stooq.com/q/d/?s=alv.de&c=0&l=6&o=0111111&o_d=1&o_p=1&o_n=1&o_o=1&o_m=1&o_x=1
+        Return DownloadCachedMonthly(String.Format("https://stooq.com/q/d/l/?s={0}&i=d&o=0111111", stooqTicker))
+    End Function
+
     Public Function DownloadCachedDaily(url As String) As String
         Return DownloadCached(url, "yyyyMMdd")
     End Function

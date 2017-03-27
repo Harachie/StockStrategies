@@ -52,4 +52,26 @@ Public Class Stock
         Return r
     End Function
 
+    Public Shared Function ReadStooqFromMetaData(metaData As StockMetaData) As Stock
+        Dim r As New Stock
+        Dim scraper As ArivaDividendsScraper
+
+        r.MetaData = metaData
+        r.Data = StockDataCollection.ReadFromStooqFile(IO.Path.Combine(GetStooqDirectory(), metaData.DataFileName))
+
+        If String.IsNullOrWhiteSpace(metaData.DividendsFileName) Then
+            scraper = New ArivaDividendsScraper
+            r.DividendsHistory = scraper.LoadDividendsHistory(metaData.ArivaName)
+            r.DividendsHistory.Save(metaData.ArivaName & ".json")
+            metaData.DividendsFileName = metaData.ArivaName & ".json"
+            metaData.Save()
+
+        Else
+            r.DividendsHistory = DividendsHistory.ReadFromFile(IO.Path.Combine(GetDividendsDirectory(), metaData.DividendsFileName))
+        End If
+
+
+        Return r
+    End Function
+
 End Class

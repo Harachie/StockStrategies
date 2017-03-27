@@ -8,13 +8,17 @@ Module Program
         Dim invest As New InvestMonthlyStrategy
         Dim metac As StockMetaDataCollection
         Dim results As New List(Of StrategyResult)
+        Dim loader As New Downloader
+        Dim sd As String
 
         CreateAllDirectories()
 
         metac = StockMetaDataCollection.ReadFromFile("german.json")
 
         For Each md As StockMetaData In metac
-            results.Add(invest.ReinvestDividends(Stock.ReadFromMetaData(md), 10000, 600))
+            results.Add(invest.ReinvestDividends(Stock.ReadStooqFromMetaData(md), 10000, 300))
+            sd = loader.DownloadStooqData(md)
+            '  WriteAllText(IO.Path.Combine(GetStooqDirectory(), md.DataFileName), sd)
         Next
 
         'Dim daimler = Stock.ReadFromFile(IO.Path.Combine(GetXetraDirectory(), "dai.de.txt"), IO.Path.Combine(IO.Directory.GetCurrentDirectory(), "Data", "dividends", "daimler.json"))
