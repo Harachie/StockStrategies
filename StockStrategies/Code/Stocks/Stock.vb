@@ -1,6 +1,8 @@
-﻿Public Class Stock
+﻿Imports StockStrategies
 
-    Public Property Name As String
+Public Class Stock
+
+    Public Property MetaData As StockMetaData
     Public Property Data As StockDataCollection
     Public Property DividendsHistory As DividendsHistory
 
@@ -32,6 +34,7 @@
         Dim r As New Stock
         Dim scraper As ArivaDividendsScraper
 
+        r.MetaData = metaData
         r.Data = StockDataCollection.ReadFromFile(IO.Path.Combine(GetXetraDirectory(), metaData.DataFileName))
 
         If String.IsNullOrWhiteSpace(metaData.DividendsFileName) Then

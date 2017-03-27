@@ -5,21 +5,34 @@ Imports Newtonsoft.Json.Linq
 Module Program
 
     Sub Main()
-        Dim dax As List(Of StockFundamentals) = LoadDax()
         Dim invest As New InvestMonthlyStrategy
-        Dim loader As New Downloader
+        Dim metac As StockMetaDataCollection
+        Dim results As New List(Of StrategyResult)
 
         CreateAllDirectories()
 
-        Dim daimler = Stock.ReadFromFile(IO.Path.Combine(GetXetraDirectory(), "dai.de.txt"), IO.Path.Combine(IO.Directory.GetCurrentDirectory(), "Data", "dividends", "daimler.json"))
-        Dim basf = Stock.ReadFromFile(IO.Path.Combine(GetXetraDirectory(), "bas.de.txt"), IO.Path.Combine(IO.Directory.GetCurrentDirectory(), "Data", "dividends", "basf.json"))
-        Dim bmw As Stock = Stock.ReadFromMetaData("bmw.json")
-        Dim metac As StockMetaDataCollection = StockMetaDataCollection.ReadFromFile("german.json")
+        metac = StockMetaDataCollection.ReadFromFile("german.json")
 
-        Dim resultDaimler = invest.ReinvestDividends(daimler, 10000, 600)
-        Dim resultBasf = invest.ReinvestDividends(basf, 10000, 600)
-        Dim resultBmw = invest.ReinvestDividends(bmw, 10000, 600)
+        For Each md As StockMetaData In metac
+            results.Add(invest.ReinvestDividends(Stock.ReadFromMetaData(md), 10000, 600))
+        Next
 
+        'Dim daimler = Stock.ReadFromFile(IO.Path.Combine(GetXetraDirectory(), "dai.de.txt"), IO.Path.Combine(IO.Directory.GetCurrentDirectory(), "Data", "dividends", "daimler.json"))
+        'Dim basf = Stock.ReadFromFile(IO.Path.Combine(GetXetraDirectory(), "bas.de.txt"), IO.Path.Combine(IO.Directory.GetCurrentDirectory(), "Data", "dividends", "basf.json"))
+        'Dim bmw As Stock = Stock.ReadFromMetaData("bmw.json")
+
+        'Dim resultDaimler = invest.ReinvestDividends(daimler, 10000, 600)
+        'Dim resultBasf = invest.ReinvestDividends(basf, 10000, 600)
+        'Dim resultBmw = invest.ReinvestDividends(bmw, 10000, 600)
+
+        Dim ka = results.OrderByDescending(Function(sr) sr.GainedDividends).Select(Function(sr)
+                                                                                       Return New With {.Name = sr.Stock.MetaData.Name, .Dividends = sr.GainedDividends, .Value = sr.CurrentInvestmentValue}
+                                                                                   End Function).ToList
+
+
+        Dim ka2 = results.OrderByDescending(Function(sr) sr.CurrentInvestmentValue).Select(Function(sr)
+                                                                                               Return New With {.Name = sr.Stock.MetaData.Name, .Dividends = sr.GainedDividends, .Value = sr.CurrentInvestmentValue}
+                                                                                           End Function).ToList
     End Sub
 
     Public Function Normalize(json As String) As String

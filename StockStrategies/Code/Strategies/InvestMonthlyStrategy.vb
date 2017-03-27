@@ -6,8 +6,9 @@
         Dim dividendsIndex, currentMonth As Integer
         Dim dividends As Dividend = Nothing
         Dim currentStockData As StockData = Nothing
-        Dim startDate As Date = DateSerial(2000, 1, 1)
+        Dim startDate As Date = DateSerial(212, 1, 1)
 
+        r.Stock = stock
         r.YearlyInvestment = moneyPerMonth * 12.0
         r.StartCaptial = startCapital
         r.Invested = r.StartCaptial
