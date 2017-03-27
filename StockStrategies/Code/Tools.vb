@@ -21,6 +21,10 @@ Public Module Tools
         Return IO.Path.Combine(IO.Directory.GetCurrentDirectory, "Data", "meta")
     End Function
 
+    Public Function GetCollectionsDirectory() As String
+        Return IO.Path.Combine(IO.Directory.GetCurrentDirectory, "Data", "collections")
+    End Function
+
     Public Function GetCacheDirectory() As String
         Return IO.Path.Combine(IO.Directory.GetCurrentDirectory, "Data", "cache")
     End Function

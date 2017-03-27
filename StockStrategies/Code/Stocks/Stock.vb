@@ -19,10 +19,11 @@
         Return r
     End Function
 
-    Public Shared Function ReadFromMetaData(metaFilePath As String) As Stock
+    Public Shared Function ReadFromMetaData(metaDataFileName As String) As Stock
         Dim metaData As StockMetaData
+        Dim filePath As String = IO.Path.Combine(GetMetaDirectory(), metaDataFileName)
 
-        metaData = StockMetaData.ReadFromFile(metaFilePath)
+        metaData = StockMetaData.ReadFromFile(filePath)
 
         Return ReadFromMetaData(metaData)
     End Function

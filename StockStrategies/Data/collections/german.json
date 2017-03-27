@@ -1,0 +1,212 @@
+﻿[
+  {
+    "Name": "Beiersdorf",
+    "WKN": "520000",
+    "ISIN": "DE0005200000",
+    "ArivaName": "beiersdorf",
+    "DataFileName": "bei.de.txt"
+  },
+  {
+    "Name": "Deutsche Telekom",
+    "WKN": "555750",
+    "ISIN": "DE0005557508",
+    "ArivaName": "deutsche_telekom",
+    "DataFileName": "dte.de.txt"
+  },
+  {
+    "Name": "Henkel VZ",
+    "WKN": "604843",
+    "ISIN": "DE0006048432",
+    "ArivaName": "henkel_vz",
+    "DataFileName": "hen3.de.txt"
+  },
+  {
+    "Name": "Deutsche Börse",
+    "WKN": "A2AA25",
+    "ISIN": "DE000A2AA253",
+    "ArivaName": "deutsche_börse",
+    "DataFileName": "db11.de.txt"
+  },
+  {
+    "Name": "E.ON",
+    "WKN": "ENAG99",
+    "ISIN": "DE000ENAG999",
+    "ArivaName": "e.on",
+    "DataFileName": "eoan.de.txt"
+  },
+  {
+    "Name": "Münchener Rückversicherungen",
+    "WKN": "843002",
+    "ISIN": "DE0008430026",
+    "ArivaName": "munich_re",
+    "DataFileName": "muv2.de.txt"
+  },
+  {
+    "Name": "Vononia",
+    "WKN": "A1ML7J",
+    "ISIN": "DE000A1ML7J1",
+    "ArivaName": "vononia",
+    "DataFileName": "vna.de.txt"
+  },
+  {
+    "Name": "BASF",
+    "WKN": "BASF11",
+    "ISIN": "DE000BASF111",
+    "ArivaName": "basf",
+    "DataFileName": "bas.de.txt"
+  },
+  {
+    "Name": "Daimler",
+    "WKN": "710000",
+    "ISIN": "DE0007100000",
+    "ArivaName": "daimler",
+    "DataFileName": "dai.de.txt"
+  },
+  {
+    "Name": "Bayer",
+    "WKN": "BAY001",
+    "ISIN": "DE000BAY0017",
+    "ArivaName": "bayer",
+    "DataFileName": "bayn.de.txt"
+  },
+  {
+    "Name": "Allianz",
+    "WKN": "840400",
+    "ISIN": "DE0008404005",
+    "ArivaName": "allianz",
+    "DataFileName": "alv.de.txt"
+  },
+  {
+    "Name": "Infineon",
+    "WKN": "623100",
+    "ISIN": "DE0006231004",
+    "ArivaName": "infineon",
+    "DataFileName": "ifx.de.txt"
+  },
+  {
+    "Name": "Adidas",
+    "WKN": "A1EWWW",
+    "ISIN": "DE000A1EWWW0",
+    "ArivaName": "adidas",
+    "DataFileName": "ads.de.txt"
+  },
+  {
+    "Name": "ProSiebenSat.1 Media",
+    "WKN": "PSM777",
+    "ISIN": "DE000PSM7770",
+    "ArivaName": "prosiebensat.1_media",
+    "DataFileName": "psm.de.txt"
+  },
+  {
+    "Name": "Fresenius Medical Care",
+    "WKN": "578580",
+    "ISIN": "DE0005785802",
+    "ArivaName": "fresenius_medical_care",
+    "DataFileName": "fme.de.txt"
+  },
+  {
+    "Name": "Linde",
+    "WKN": "648300",
+    "ISIN": "DE0006483001",
+    "ArivaName": "linde",
+    "DataFileName": "lin.de.txt"
+  },
+  {
+    "Name": "Fresenius",
+    "WKN": "578560",
+    "ISIN": "DE0005785604",
+    "ArivaName": "fresenius",
+    "DataFileName": "fre.de.txt"
+  },
+  {
+    "Name": "Merck",
+    "WKN": "659990",
+    "ISIN": "DE0006599905",
+    "ArivaName": "merck_kgaa",
+    "DataFileName": "mrk.de.txt"
+  },
+  {
+    "Name": "Continental",
+    "WKN": "543900",
+    "ISIN": "DE0005439004",
+    "ArivaName": "continental",
+    "DataFileName": "_con.de.txt"
+  },
+  {
+    "Name": "Heidelberg Cement",
+    "WKN": "604700",
+    "ISIN": "DE0006047004",
+    "ArivaName": "heidelbergcement",
+    "DataFileName": "hei.de.txt"
+  },
+  {
+    "Name": "BMW Stammaktie",
+    "WKN": "519000",
+    "ISIN": "DE0005190003",
+    "ArivaName": "bmw",
+    "DataFileName": "bmw.de.txt"
+  },
+  {
+    "Name": "Deutsche Post",
+    "WKN": "555200",
+    "ISIN": "DE0005552004",
+    "ArivaName": "deutsche_post",
+    "DataFileName": "dpw.de.txt"
+  },
+  {
+    "Name": "Deutsche Bank",
+    "WKN": "514000",
+    "ISIN": "DE0005140008",
+    "ArivaName": "deutsche_bank",
+    "DataFileName": "dbk.de.txt"
+  },
+  {
+    "Name": "Commerzbank",
+    "WKN": "CBK100",
+    "ISIN": "DE000CBK1001",
+    "ArivaName": "commerzbank",
+    "DataFileName": "cbk.de.txt"
+  },
+  {
+    "Name": "Siemens",
+    "WKN": "723610",
+    "ISIN": "DE0007236101",
+    "ArivaName": "siemens",
+    "DataFileName": "sie.de.txt"
+  },
+  {
+    "Name": "SAP",
+    "WKN": "716460",
+    "ISIN": "DE0007164600",
+    "ArivaName": "sap",
+    "DataFileName": "sap.de.txt"
+  },
+  {
+    "Name": "Thyssen Krupp",
+    "WKN": "750000",
+    "ISIN": "DE0007500001",
+    "ArivaName": "thyssenkrupp",
+    "DataFileName": "tka.de.txt"
+  },
+  {
+    "Name": "Volkswagen VZ",
+    "WKN": "766403",
+    "ISIN": "DE0007664039",
+    "ArivaName": "volkswagen_vz",
+    "DataFileName": "vow3.de.txt"
+  },
+  {
+    "Name": "Lufthansa",
+    "WKN": "823212",
+    "ISIN": "DE0008232125",
+    "ArivaName": "lufthansa",
+    "DataFileName": "lha.de.txt"
+  },
+  {
+    "Name": "RWE",
+    "WKN": "703712",
+    "ISIN": "DE0007037129",
+    "ArivaName": "rwe",
+    "DataFileName": "rwe.de.txt"
+  }
+]
