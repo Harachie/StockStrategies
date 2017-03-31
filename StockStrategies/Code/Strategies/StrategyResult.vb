@@ -1,7 +1,7 @@
 ﻿Public Class StrategyResult
 
-    Public Property StockFundamentals As StockFundamentals
     Public Property Stock As Stock
+    Public Property StockFundamentals As StockFundamentals
     Public Property StartCaptial As Double
     Public Property YearlyInvestment As Double
     Public Property StockAmount As Double

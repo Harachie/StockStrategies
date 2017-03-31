@@ -16,8 +16,8 @@ Module Program
         metac = StockMetaDataCollection.ReadFromFile("german.json")
 
         For Each md As StockMetaData In metac
-            results.Add(invest.ReinvestDividends(Stock.ReadStooqFromMetaData(md), 10000, 300))
-            sd = loader.DownloadStooqData(md)
+            results.Add(invest.ReinvestDividends(Stock.ReadStooqFromMetaData(md), 10000, 100))
+            '   sd = loader.DownloadStooqData(md)
             '  WriteAllText(IO.Path.Combine(GetStooqDirectory(), md.DataFileName), sd)
         Next
 
