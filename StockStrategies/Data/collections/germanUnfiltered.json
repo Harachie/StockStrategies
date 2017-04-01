@@ -23,6 +23,14 @@
     "StooqTicker": "hen3.de",
     "DataFileName": "hen3.de.txt"
   },
+  //{
+  //  "Name": "Deutsche Börse",
+  //  "WKN": "A2AA25",
+  //  "ISIN": "DE000A2AA253",
+  //  "ArivaName": "deutsche_börse",
+  //  "StooqTicker": "db11.de",
+  //  "DataFileName": "db11.de.txt"
+  //},
   {
     "Name": "E.ON",
     "WKN": "ENAG99",
@@ -39,6 +47,14 @@
     "StooqTicker": "muv2.de",
     "DataFileName": "muv2.de.txt"
   },
+  //{
+  //  "Name": "Vonovia",
+  //  "WKN": "A1ML7J",
+  //  "ISIN": "DE000A1ML7J1",
+  //  "ArivaName": "vonovia",
+  //  "StooqTicker": "vna.de",
+  //  "DataFileName": "vna.de.txt"
+  //},
   {
     "Name": "BASF",
     "WKN": "BASF11",
@@ -111,6 +127,14 @@
     "StooqTicker": "lin.de",
     "DataFileName": "lin.de.txt"
   },
+  //{
+  //  "Name": "Fresenius",
+  //  "WKN": "578560",
+  //  "ISIN": "DE0005785604",
+  //  "ArivaName": "fresenius",
+  //  "StooqTicker": "fre.de",
+  //  "DataFileName": "fre.de.txt"
+  //},
   {
     "Name": "Merck",
     "WKN": "659990",

@@ -86,6 +86,7 @@
     <Compile Include="Code\Stocks\StockFundamentals.vb" />
     <Compile Include="Code\Stocks\StockData.vb" />
     <Compile Include="Code\Strategies\InvestMonthlyStrategy.vb" />
+    <Compile Include="Code\Strategies\MomentumStrategy.vb" />
     <Compile Include="Code\Strategies\StrategyResult.vb" />
     <Compile Include="Code\Tools.vb" />
     <Compile Include="Code\Web\Downloader.vb" />
@@ -115,6 +116,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Data\collections\germanUnfiltered.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Data\collections\german.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
