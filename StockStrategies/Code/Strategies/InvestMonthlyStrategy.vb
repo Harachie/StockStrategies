@@ -47,7 +47,7 @@
 
             If dividends IsNot Nothing AndAlso currentStockData.Date >= dividends.DistributionDate Then
                 dividendsIndex += 1
-                dividendsBeforeTax += r.StockAmount * dividends.Amount
+                dividendsBeforeTax = r.StockAmount * dividends.Amount
 
                 If dividendsBeforeTax > TAX_FREE_AMOUNT Then
                     dividendsAfterTax = TAX_FREE_AMOUNT + (dividendsBeforeTax - TAX_FREE_AMOUNT) * TAX_FREE_MULTIPLIER

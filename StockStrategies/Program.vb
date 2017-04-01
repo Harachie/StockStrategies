@@ -22,7 +22,7 @@ Module Program
         For Each md As StockMetaData In metac
             s = Stock.ReadStooqFromMetaData(md)
             allStocks.Add(s)
-            results.Add(invest.ReinvestDividends(s, 10000, 100))
+            results.Add(invest.ReinvestDividends(s, 10000, 1200))
             '   sd = loader.DownloadStooqData(md)
             '  WriteAllText(IO.Path.Combine(GetStooqDirectory(), md.DataFileName), sd)
         Next
@@ -31,51 +31,113 @@ Module Program
         Dim basf = Stock.ReadFromMetaData("basf.json")
         Dim bmw As Stock = Stock.ReadFromMetaData("bmw.json")
 
-        'Dim resultDaimler = invest.ReinvestDividends(daimler, 10000, 600)
-        'Dim resultBasf = invest.ReinvestDividends(basf, 10000, 600)
-        'Dim resultBmw = invest.ReinvestDividends(bmw, 10000, 600)
+        Dim resultDaimler = invest.ReinvestDividends(daimler, 10000, 1200)
+        Dim resultBasf = invest.ReinvestDividends(basf, 10000, 1200)
+        Dim resultBmw = invest.ReinvestDividends(bmw, 10000, 1200)
 
         'Dim momrs = momentum.InvestMonthlySelectMaximumMomentum({daimler, basf, bmw}, 10000, 1200)
         'Dim momrsev = momentum.InvestMonthly({daimler, basf, bmw}, 10000, 1200)
 
         Dim kp As New List(Of Object)
         Dim investedEvenly, investedMax, investedMin As Double
+        momentum.StartDate = DateSerial(2005, 1, 1)
 
-        For i As Integer = 5 To 260 Step 5
+        For i As Integer = 1 To 390 Step 1
             momentum.StepSize = i
 
-            Dim momrsa = momentum.InvestMonthlySelectMaximumMomentum(allStocks, 10000, 1200)
-            Dim overall = momrsa.Select(Function(sr) sr.CurrentInvestmentValue).Sum
+            'Dim momrsa = momentum.InvestMonthlySelectMaximumMomentum(allStocks, 10000, 1200)
+            'Dim maxMomentum = momrsa.Select(Function(sr) sr.CurrentInvestmentValue).Sum
 
-            Dim momrsevai = momentum.InvestMonthlySelectMinimumMomentum(allStocks, 10000, 1200)
-            Dim overallei = momrsevai.Select(Function(sr) sr.CurrentInvestmentValue).Sum
+            Dim maxMomentumReinvestResults = momentum.InvestMonthlyReinvestDividendsSelectMaximumMomentum(allStocks, 10000, 1200)
+            Dim maxMomentumReinvest = maxMomentumReinvestResults.Select(Function(sr) sr.CurrentInvestmentValue).Sum
 
-            Dim momrseva = momentum.InvestMonthly(allStocks, 10000, 1200)
-            Dim overalle = momrseva.Select(Function(sr) sr.CurrentInvestmentValue).Sum
+            Dim minMomentumReinvestResults = momentum.InvestMonthlyReinvestDividendsSelectMinimumMomentum(allStocks, 10000, 1200)
+            Dim minMomentumReinvest = minMomentumReinvestResults.Select(Function(sr) sr.CurrentInvestmentValue).Sum
 
-            Dim max3Momentum = momentum.InvestMonthlySelectMaximumMomentum(allStocks, 10000, 1200, 2)
-            Dim max3Overall = max3Momentum.Select(Function(sr) sr.CurrentInvestmentValue).Sum
+            Dim momrseva = momentum.InvestMonthlyReinvestDividends(allStocks, 10000, 1200)
+            Dim evently = momrseva.Select(Function(sr) sr.CurrentInvestmentValue).Sum
 
-            Dim min3Momentum = momentum.InvestMonthlySelectMinimumMomentum(allStocks, 10000, 1200, 2)
-            Dim min3Overall = min3Momentum.Select(Function(sr) sr.CurrentInvestmentValue).Sum
+            'Dim max3Momentum = momentum.InvestMonthlySelectMaximumMomentum(allStocks, 10000, 1200, 2)
+            'Dim maxMomentumN = max3Momentum.Select(Function(sr) sr.CurrentInvestmentValue).Sum
 
-            investedEvenly = momrseva.Select(Function(sr) sr.Invested).Sum
-            investedMax = momrsa.Select(Function(sr) sr.Invested).Sum
-            investedMin = momrsevai.Select(Function(sr) sr.Invested).Sum
+            'Dim min3Momentum = momentum.InvestMonthlySelectMinimumMomentum(allStocks, 10000, 1200, 2)
+            'Dim min3Overall = min3Momentum.Select(Function(sr) sr.CurrentInvestmentValue).Sum
 
-            kp.Add(New With {.Even = overalle, .MH = Math.Round(overall, 0), .MH3 = Math.Round(max3Overall, 0), .ML = Math.Round(overallei, 0), .ML3 = Math.Round(min3Overall, 0), .S = i})
-            Console.WriteLine("E {0:n0}, mh {1:n0}, mh3 {2:n0}, ml {3:n0}, m3l {4:n0}, s {5:n0}", overalle, overall, max3Overall, overallei, min3Overall, i)
+            '  investedEvenly = momrseva.Select(Function(sr) sr.Invested).Sum
+            '  investedMax = momrsa.Select(Function(sr) sr.Invested).Sum
+            ' investedMin = momrsevai.Select(Function(sr) sr.Invested).Sum
+
+            ' Console.WriteLine("E {0:n0}, mh {1:n0}, mhR {2:n0}, mhN {3:n0}, ml {4:n0}, mNl {5:n0}, s {6:n0}", evently, maxMomentum, maxMomentumReinvest, maxMomentumN, overallei, min3Overall, i)
+
+
+            '   Console.WriteLine("E {0:n0}, max {1:n0}, min {2:n0}, s {3:n0}", evently, maxMomentumReinvest, minMomentumReinvest, i)
+
+            Console.Write("e {0:n}", evently)
+            Console.Write(", max ")
+
+            If maxMomentumReinvest > evently Then
+                Console.ForegroundColor = ConsoleColor.Green
+                Console.Write("{0:n0}", maxMomentumReinvest)
+
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.Write(" (")
+                Console.ForegroundColor = ConsoleColor.Green
+                Console.Write("{0:n2}", (maxMomentumReinvest / evently).AsHumanReadablePercent)
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.Write(")")
+            Else
+                Console.ForegroundColor = ConsoleColor.Red
+                Console.Write("{0:n0}", maxMomentumReinvest)
+
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.Write(" (")
+                Console.ForegroundColor = ConsoleColor.Red
+                Console.Write("{0:n2}", (maxMomentumReinvest / evently).AsHumanReadablePercent)
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.Write(")")
+            End If
+
+            Console.ForegroundColor = ConsoleColor.Gray
+            Console.Write(", min ")
+
+            If minMomentumReinvest > evently Then
+                Console.ForegroundColor = ConsoleColor.Green
+                Console.Write("{0:n0}", minMomentumReinvest)
+
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.Write(" (")
+                Console.ForegroundColor = ConsoleColor.Green
+                Console.Write("{0:n2}", (minMomentumReinvest / evently).AsHumanReadablePercent)
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.Write(")")
+
+            Else
+                Console.ForegroundColor = ConsoleColor.Red
+                Console.Write("{0:n0}", minMomentumReinvest)
+
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.Write(" (")
+                Console.ForegroundColor = ConsoleColor.Red
+                Console.Write("{0:n2}", (minMomentumReinvest / evently).AsHumanReadablePercent)
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.Write(")")
+            End If
+
+            Console.ForegroundColor = ConsoleColor.Gray
+            Console.Write(", ")
+
+            Console.WriteLine("s {0:n0}", i)
             '  Console.WriteLine(i)
         Next
 
-        'Dim ka = results.OrderByDescending(Function(sr) sr.GainedDividends).Select(Function(sr)
-        '                                                                               Return New With {.Name = sr.Stock.MetaData.Name, .Dividends = sr.GainedDividends, .Value = sr.CurrentInvestmentValue}
-        '                                                                           End Function).ToList
+        Dim ka = results.OrderByDescending(Function(sr) sr.GainedDividends).Select(Function(sr)
+                                                                                       Return New With {.Name = sr.Stock.MetaData.Name, .Dividends = sr.GainedDividends, .Value = sr.CurrentInvestmentValue}
+                                                                                   End Function).ToList
 
 
-        'Dim ka2 = results.OrderByDescending(Function(sr) sr.CurrentInvestmentValue).Select(Function(sr)
-        '                                                                                       Return New With {.Name = sr.Stock.MetaData.Name, .Dividends = sr.GainedDividends, .Value = sr.CurrentInvestmentValue}
-        '                                                                                   End Function).ToList
+        Dim ka2 = results.OrderByDescending(Function(sr) sr.CurrentInvestmentValue).Select(Function(sr)
+                                                                                               Return New With {.Name = sr.Stock.MetaData.Name, .Dividends = sr.GainedDividends, .Value = sr.CurrentInvestmentValue}
+                                                                                           End Function).ToList
     End Sub
 
     Public Function Normalize(json As String) As String

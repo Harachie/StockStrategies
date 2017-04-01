@@ -8,28 +8,12 @@
     "DataFileName": "bei.de.txt"
   },
   {
-    "Name": "Deutsche Telekom",
-    "WKN": "555750",
-    "ISIN": "DE0005557508",
-    "ArivaName": "deutsche_telekom",
-    "StooqTicker": "dte.de",
-    "DataFileName": "dte.de.txt"
-  },
-  {
     "Name": "Henkel VZ",
     "WKN": "604843",
     "ISIN": "DE0006048432",
     "ArivaName": "henkel_vz",
     "StooqTicker": "hen3.de",
     "DataFileName": "hen3.de.txt"
-  },
-  {
-    "Name": "E.ON",
-    "WKN": "ENAG99",
-    "ISIN": "DE000ENAG999",
-    "ArivaName": "e.on",
-    "StooqTicker": "eoan.de",
-    "DataFileName": "eoan.de.txt"
   },
   {
     "Name": "Münchener Rückversicherungen",
@@ -88,14 +72,6 @@
     "DataFileName": "ads.de.txt"
   },
   {
-    "Name": "ProSiebenSat.1 Media",
-    "WKN": "PSM777",
-    "ISIN": "DE000PSM7770",
-    "ArivaName": "prosiebensat.1_media",
-    "StooqTicker": "psm.de",
-    "DataFileName": "psm.de.txt"
-  },
-  {
     "Name": "Fresenius Medical Care",
     "WKN": "578580",
     "ISIN": "DE0005785802",
@@ -152,22 +128,6 @@
     "DataFileName": "dpw.de.txt"
   },
   {
-    "Name": "Deutsche Bank",
-    "WKN": "514000",
-    "ISIN": "DE0005140008",
-    "ArivaName": "deutsche_bank",
-    "StooqTicker": "dbk.de",
-    "DataFileName": "dbk.de.txt"
-  },
-  {
-    "Name": "Commerzbank",
-    "WKN": "CBK100",
-    "ISIN": "DE000CBK1001",
-    "ArivaName": "commerzbank",
-    "StooqTicker": "cbk.de",
-    "DataFileName": "cbk.de.txt"
-  },
-  {
     "Name": "Siemens",
     "WKN": "723610",
     "ISIN": "DE0007236101",
@@ -206,13 +166,5 @@
     "ArivaName": "lufthansa",
     "StooqTicker": "lha.de",
     "DataFileName": "lha.de.txt"
-  },
-  {
-    "Name": "RWE",
-    "WKN": "703712",
-    "ISIN": "DE0007037129",
-    "ArivaName": "rwe",
-    "StooqTicker": "rwe.de",
-    "DataFileName": "rwe.de.txt"
   }
 ]

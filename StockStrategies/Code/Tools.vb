@@ -55,4 +55,8 @@ Public Module Tools
         Return BitConverter.ToString(hash.ComputeHash(data)).Replace("-", String.Empty)
     End Function
 
+    <Extension> Public Function AsHumanReadablePercent(this As Double) As Double
+        Return (this - 1.0) * 100.0
+    End Function
+
 End Module
