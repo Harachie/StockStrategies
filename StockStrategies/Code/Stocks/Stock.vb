@@ -1,6 +1,6 @@
 ﻿Imports StockStrategies
 
-Public Class Stock
+<Diagnostics.DebuggerDisplay("{MetaData.Name}")> Public Class Stock
 
     Public Property MetaData As StockMetaData
     Public Property Data As StockDataCollection

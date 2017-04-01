@@ -15,14 +15,14 @@
     "StooqTicker": "hen3.de",
     "DataFileName": "hen3.de.txt"
   },
-  {
-    "Name": "Münchener Rückversicherungen",
-    "WKN": "843002",
-    "ISIN": "DE0008430026",
-    "ArivaName": "munich_re",
-    "StooqTicker": "muv2.de",
-    "DataFileName": "muv2.de.txt"
-  },
+  //{
+  //  "Name": "Münchener Rückversicherungen",
+  //  "WKN": "843002",
+  //  "ISIN": "DE0008430026",
+  //  "ArivaName": "munich_re",
+  //  "StooqTicker": "muv2.de",
+  //  "DataFileName": "muv2.de.txt"
+  //},
   {
     "Name": "BASF",
     "WKN": "BASF11",
@@ -47,14 +47,14 @@
     "StooqTicker": "bayn.de",
     "DataFileName": "bayn.de.txt"
   },
-  {
-    "Name": "Allianz",
-    "WKN": "840400",
-    "ISIN": "DE0008404005",
-    "ArivaName": "allianz",
-    "StooqTicker": "alv.de",
-    "DataFileName": "alv.de.txt"
-  },
+  //{
+  //  "Name": "Allianz",
+  //  "WKN": "840400",
+  //  "ISIN": "DE0008404005",
+  //  "ArivaName": "allianz",
+  //  "StooqTicker": "alv.de",
+  //  "DataFileName": "alv.de.txt"
+  //},
   {
     "Name": "Infineon",
     "WKN": "623100",
@@ -103,14 +103,14 @@
     "StooqTicker": "con.de",
     "DataFileName": "_con.de.txt"
   },
-  {
-    "Name": "Heidelberg Cement",
-    "WKN": "604700",
-    "ISIN": "DE0006047004",
-    "ArivaName": "heidelbergcement",
-    "StooqTicker": "hei.de",
-    "DataFileName": "hei.de.txt"
-  },
+  //{
+  //  "Name": "Heidelberg Cement",
+  //  "WKN": "604700",
+  //  "ISIN": "DE0006047004",
+  //  "ArivaName": "heidelbergcement",
+  //  "StooqTicker": "hei.de",
+  //  "DataFileName": "hei.de.txt"
+  //},
   {
     "Name": "BMW",
     "WKN": "519000",
@@ -158,13 +158,13 @@
     "ArivaName": "volkswagen_vz",
     "StooqTicker": "vow3.de",
     "DataFileName": "vow3.de.txt"
-  },
-  {
-    "Name": "Lufthansa",
-    "WKN": "823212",
-    "ISIN": "DE0008232125",
-    "ArivaName": "lufthansa",
-    "StooqTicker": "lha.de",
-    "DataFileName": "lha.de.txt"
-  }
+  }//,
+  //{
+  //  "Name": "Lufthansa",
+  //  "WKN": "823212",
+  //  "ISIN": "DE0008232125",
+  //  "ArivaName": "lufthansa",
+  //  "StooqTicker": "lha.de",
+  //  "DataFileName": "lha.de.txt"
+  //}
 ]

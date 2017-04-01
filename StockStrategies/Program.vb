@@ -30,6 +30,7 @@ Module Program
         Dim daimler = Stock.ReadFromMetaData("daimler.json")
         Dim basf = Stock.ReadFromMetaData("basf.json")
         Dim bmw As Stock = Stock.ReadFromMetaData("bmw.json")
+        Dim vw As Stock = Stock.ReadFromMetaData("Volkswagen VZ.json")
 
         Dim resultDaimler = invest.ReinvestDividends(daimler, 10000, 1200)
         Dim resultBasf = invest.ReinvestDividends(basf, 10000, 1200)
@@ -40,10 +41,16 @@ Module Program
 
         Dim kp As New List(Of Object)
         Dim investedEvenly, investedMax, investedMin As Double
-        momentum.StartDate = DateSerial(2005, 1, 1)
+        Dim divinvest As New DividendStrategy
 
-        For i As Integer = 1 To 390 Step 1
+        '  momentum.StartDate = DateSerial(2008, 1, 1)
+
+        '  allStocks = {daimler, basf, bmw, vw}.ToList
+        Dim addedStocks As New List(Of String)
+
+        For i As Integer = 1 To 390 Step 5
             momentum.StepSize = i
+            divinvest.StepSize = i
 
             'Dim momrsa = momentum.InvestMonthlySelectMaximumMomentum(allStocks, 10000, 1200)
             'Dim maxMomentum = momrsa.Select(Function(sr) sr.CurrentInvestmentValue).Sum
@@ -53,6 +60,9 @@ Module Program
 
             Dim minMomentumReinvestResults = momentum.InvestMonthlyReinvestDividendsSelectMinimumMomentum(allStocks, 10000, 1200)
             Dim minMomentumReinvest = minMomentumReinvestResults.Select(Function(sr) sr.CurrentInvestmentValue).Sum
+
+            Dim maxDividendsResults = divinvest.InvestMonthlyReinvestDividendsSelectMaximumDividend(allStocks, 10000, 1200)
+            Dim maxDividends = maxDividendsResults.Select(Function(sr) sr.CurrentInvestmentValue).Sum
 
             Dim momrseva = momentum.InvestMonthlyReinvestDividends(allStocks, 10000, 1200)
             Dim evently = momrseva.Select(Function(sr) sr.CurrentInvestmentValue).Sum
@@ -73,7 +83,7 @@ Module Program
             '   Console.WriteLine("E {0:n0}, max {1:n0}, min {2:n0}, s {3:n0}", evently, maxMomentumReinvest, minMomentumReinvest, i)
 
             Console.Write("e {0:n}", evently)
-            Console.Write(", max ")
+            Console.Write(", max" & vbTab)
 
             If maxMomentumReinvest > evently Then
                 Console.ForegroundColor = ConsoleColor.Green
@@ -98,7 +108,7 @@ Module Program
             End If
 
             Console.ForegroundColor = ConsoleColor.Gray
-            Console.Write(", min ")
+            Console.Write(", min" & vbTab)
 
             If minMomentumReinvest > evently Then
                 Console.ForegroundColor = ConsoleColor.Green
@@ -124,10 +134,38 @@ Module Program
             End If
 
             Console.ForegroundColor = ConsoleColor.Gray
+            Console.Write(", div" & vbTab)
+
+            If maxDividends > evently Then
+                Console.ForegroundColor = ConsoleColor.Green
+                Console.Write("{0:n0}", maxDividends)
+
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.Write(" (")
+                Console.ForegroundColor = ConsoleColor.Green
+                Console.Write("{0:n2}", (maxDividends / evently).AsHumanReadablePercent)
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.Write(")")
+
+            Else
+                Console.ForegroundColor = ConsoleColor.Red
+                Console.Write("{0:n0}", maxDividends)
+
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.Write(" (")
+                Console.ForegroundColor = ConsoleColor.Red
+                Console.Write("{0:n2}", (maxDividends / evently).AsHumanReadablePercent)
+                Console.ForegroundColor = ConsoleColor.Gray
+                Console.Write(")")
+            End If
+
+            Console.ForegroundColor = ConsoleColor.Gray
             Console.Write(", ")
 
             Console.WriteLine("s {0:n0}", i)
             '  Console.WriteLine(i)
+
+            addedStocks.Add(String.Join(", ", minMomentumReinvestResults.Where(Function(r) r.StockAmount > 0).Select(Function(r) r.Stock.MetaData.Name)))
         Next
 
         Dim ka = results.OrderByDescending(Function(sr) sr.GainedDividends).Select(Function(sr)
