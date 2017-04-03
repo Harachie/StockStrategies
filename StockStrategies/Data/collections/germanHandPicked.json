@@ -8,14 +8,6 @@
     "DataFileName": "bei.de.txt"
   },
   {
-    "Name": "Deutsche Telekom",
-    "WKN": "555750",
-    "ISIN": "DE0005557508",
-    "ArivaName": "deutsche_telekom",
-    "StooqTicker": "dte.de",
-    "DataFileName": "dte.de.txt"
-  },
-  {
     "Name": "Henkel VZ",
     "WKN": "604843",
     "ISIN": "DE0006048432",
@@ -23,38 +15,6 @@
     "StooqTicker": "hen3.de",
     "DataFileName": "hen3.de.txt"
   },
-  //{
-  //  "Name": "Deutsche Börse",
-  //  "WKN": "A2AA25",
-  //  "ISIN": "DE000A2AA253",
-  //  "ArivaName": "deutsche_börse",
-  //  "StooqTicker": "db11.de",
-  //  "DataFileName": "db11.de.txt"
-  //},
-  {
-    "Name": "E.ON",
-    "WKN": "ENAG99",
-    "ISIN": "DE000ENAG999",
-    "ArivaName": "e.on",
-    "StooqTicker": "eoan.de",
-    "DataFileName": "eoan.de.txt"
-  },
-  {
-    "Name": "Münchener Rückversicherungen",
-    "WKN": "843002",
-    "ISIN": "DE0008430026",
-    "ArivaName": "munich_re",
-    "StooqTicker": "muv2.de",
-    "DataFileName": "muv2.de.txt"
-  },
-  //{
-  //  "Name": "Vonovia",
-  //  "WKN": "A1ML7J",
-  //  "ISIN": "DE000A1ML7J1",
-  //  "ArivaName": "vonovia",
-  //  "StooqTicker": "vna.de",
-  //  "DataFileName": "vna.de.txt"
-  //},
   {
     "Name": "BASF",
     "WKN": "BASF11",
@@ -80,14 +40,6 @@
     "DataFileName": "bayn.de.txt"
   },
   {
-    "Name": "Allianz",
-    "WKN": "840400",
-    "ISIN": "DE0008404005",
-    "ArivaName": "allianz",
-    "StooqTicker": "alv.de",
-    "DataFileName": "alv.de.txt"
-  },
-  {
     "Name": "Infineon",
     "WKN": "623100",
     "ISIN": "DE0006231004",
@@ -102,14 +54,6 @@
     "ArivaName": "adidas",
     "StooqTicker": "ads.de",
     "DataFileName": "ads.de.txt"
-  },
-  {
-    "Name": "ProSiebenSat.1 Media",
-    "WKN": "PSM777",
-    "ISIN": "DE000PSM7770",
-    "ArivaName": "prosiebensat.1_media",
-    "StooqTicker": "psm.de",
-    "DataFileName": "psm.de.txt"
   },
   {
     "Name": "Fresenius Medical Care",
@@ -127,14 +71,6 @@
     "StooqTicker": "lin.de",
     "DataFileName": "lin.de.txt"
   },
-  //{
-  //  "Name": "Fresenius",
-  //  "WKN": "578560",
-  //  "ISIN": "DE0005785604",
-  //  "ArivaName": "fresenius",
-  //  "StooqTicker": "fre.de",
-  //  "DataFileName": "fre.de.txt"
-  //},
   {
     "Name": "Merck",
     "WKN": "659990",
@@ -150,14 +86,6 @@
     "ArivaName": "continental",
     "StooqTicker": "con.de",
     "DataFileName": "_con.de.txt"
-  },
-  {
-    "Name": "Heidelberg Cement",
-    "WKN": "604700",
-    "ISIN": "DE0006047004",
-    "ArivaName": "heidelbergcement",
-    "StooqTicker": "hei.de",
-    "DataFileName": "hei.de.txt"
   },
   {
     "Name": "BMW",
@@ -176,20 +104,12 @@
     "DataFileName": "dpw.de.txt"
   },
   {
-    "Name": "Deutsche Bank",
-    "WKN": "514000",
-    "ISIN": "DE0005140008",
-    "ArivaName": "deutsche_bank",
-    "StooqTicker": "dbk.de",
-    "DataFileName": "dbk.de.txt"
-  },
-  {
-    "Name": "Commerzbank",
-    "WKN": "CBK100",
-    "ISIN": "DE000CBK1001",
-    "ArivaName": "commerzbank",
-    "StooqTicker": "cbk.de",
-    "DataFileName": "cbk.de.txt"
+    "Name": "ProSiebenSat.1 Media",
+    "WKN": "PSM777",
+    "ISIN": "DE000PSM7770",
+    "ArivaName": "prosiebensat.1_media",
+    "StooqTicker": "psm.de",
+    "DataFileName": "psm.de.txt"
   },
   {
     "Name": "Siemens",
@@ -222,21 +142,5 @@
     "ArivaName": "volkswagen_vz",
     "StooqTicker": "vow3.de",
     "DataFileName": "vow3.de.txt"
-  },
-  {
-    "Name": "Lufthansa",
-    "WKN": "823212",
-    "ISIN": "DE0008232125",
-    "ArivaName": "lufthansa",
-    "StooqTicker": "lha.de",
-    "DataFileName": "lha.de.txt"
-  },
-  {
-    "Name": "RWE",
-    "WKN": "703712",
-    "ISIN": "DE0007037129",
-    "ArivaName": "rwe",
-    "StooqTicker": "rwe.de",
-    "DataFileName": "rwe.de.txt"
   }
 ]

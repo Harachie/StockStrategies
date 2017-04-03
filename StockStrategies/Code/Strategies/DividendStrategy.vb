@@ -3,16 +3,19 @@
     Public Property StartDate As Date = DateSerial(2000, 1, 1)
     Public Property StepSize As Integer = 130
 
-    Public Function InvestMonthlyReinvestDividendsSelectMaximumDividend(stocks As IEnumerable(Of Stock), startCapitalPerStock As Double, moneyPerMonth As Double) As IEnumerable(Of StrategyResult)
+    Public Function InvestMonthlyReinvestDividendsSelectMaximumDividend(stocks As IEnumerable(Of Stock), startCapitalPerStock As Double, moneyPerMonth As Double, stocksToPick As Integer) As IEnumerable(Of StrategyResult)
         Dim results As New List(Of StrategyResult)
         Dim dataSets As IList(Of StockDataCollection) = New List(Of StockDataCollection)
-        Dim dividendsIndex, currentMonth, investIndex As Integer
+        Dim dividendsIndex, currentMonth As Integer
         Dim currentStockData As StockData
-        Dim dividendsBeforeTax, dividendsAfterTax, dividendsMoney, addedStockAmount, currentDividendYield, max As Double
+        Dim dividendsBeforeTax, dividendsAfterTax, dividendsMoney, addedStockAmount, currentDividendYield, moneyToInvest As Double
         Dim dividends As Dividend = Nothing
         Dim stocksList As New List(Of Stock)
         Dim dividendIndieces As New Dictionary(Of Stock, Integer)
         Dim dividendsData As New Dictionary(Of Stock, Dividend)
+        Dim valueIndices As New List(Of DoubleIndex)
+        Dim usedDividends As New HashSet(Of Dividend)
+        Dim tempInvest As Double
 
         For Each s As Stock In stocks
             results.Add(New StrategyResult With {.Stock = s})
@@ -31,13 +34,15 @@
 
         dataSets = StockDataCollection.StripNonExistentDates(dataSets.ToArray())
         currentMonth = dataSets(0)(Me.StepSize).Date.Month
+        moneyToInvest = moneyPerMonth / stocksToPick
 
         For i As Integer = Me.StepSize To dataSets(0).Count - 1
             currentStockData = dataSets(0)(i)
+            tempInvest = moneyPerMonth + 1
 
             If moneyPerMonth > 0 AndAlso currentStockData.Date.Month <> currentMonth Then 'jeden monatswechsel kaufen
                 currentMonth = currentStockData.Date.Month
-                max = 0.0
+                valueIndices.Clear()
 
                 For n As Integer = 0 To dataSets.Count - 1
                     dividends = dividendsData(stocksList(n))
@@ -50,23 +55,33 @@
                             currentStockData = dataSets(n)(i - 1)
                             dividends = stocksList(n).DividendsHistory(dividendsIndex)
                             currentDividendYield = dividends.Amount / currentStockData.Close
-
-                            If currentDividendYield > max Then
-                                max = currentDividendYield
-                                investIndex = n
-                            End If
+                            valueIndices.Add(New DoubleIndex With {.Value = currentDividendYield, .Index = n})
                         End If
                     End If
                 Next
 
-                addedStockAmount = moneyPerMonth / dataSets(investIndex)(i).Open
-                results(investIndex).Invested += moneyPerMonth
-                results(investIndex).StockAmount += addedStockAmount
-                results(investIndex).AddLogEntry("Added {0:n2} monthly stocks ({1}), new amount {2:n2}", addedStockAmount, currentStockData.Date.ToString("MMM yyyy"), results(investIndex).StockAmount)
+                If valueIndices.Count < stocksToPick Then
+                    moneyToInvest = moneyPerMonth / valueIndices.Count
+                Else
+                    moneyToInvest = moneyPerMonth / stocksToPick
+                End If
+
+                For Each di In valueIndices.OrderByDescending(Function(vi) vi.Value).Take(stocksToPick)
+                    addedStockAmount = moneyToInvest / dataSets(di.Index)(i).Open
+                    tempInvest -= moneyToInvest
+                    results(di.Index).Invested += moneyToInvest
+                    results(di.Index).StockAmount += addedStockAmount
+                    results(di.Index).AddLogEntry("Added {0:n2} monthly stocks ({1}), new amount {2:n2}", addedStockAmount, currentStockData.Date.ToString("MMM yyyy"), results(di.Index).StockAmount)
+                Next
+
+                If tempInvest < 0 Then
+                    Dim stophere = 1
+                End If
             End If
 
             If dividendsMoney > 0 Then 'geld der dividenden kann ich nicht am tag der ausschüttung investieren
-                max = 0.0
+                valueIndices.Clear()
+                tempInvest = dividendsMoney + 1
 
                 For n As Integer = 0 To dataSets.Count - 1
                     dividends = dividendsData(stocksList(n))
@@ -79,18 +94,29 @@
                             currentStockData = dataSets(n)(i - 1)
                             dividends = stocksList(n).DividendsHistory(dividendsIndex)
                             currentDividendYield = dividends.Amount / currentStockData.Close
-
-                            If currentDividendYield > max Then
-                                max = currentDividendYield
-                                investIndex = n
-                            End If
+                            valueIndices.Add(New DoubleIndex With {.Value = currentDividendYield, .Index = n})
                         End If
                     End If
                 Next
 
-                addedStockAmount = dividendsMoney / dataSets(investIndex)(i).Open
-                results(investIndex).StockAmount += addedStockAmount
-                results(investIndex).AddLogEntry("Added {0:n2} dividend stocks ({1}), new amount {2:n2}", addedStockAmount, currentStockData.Date.ToString("MMM yyyy"), results(investIndex).StockAmount)
+                If valueIndices.Count < stocksToPick Then
+                    moneyToInvest = dividendsMoney / valueIndices.Count
+                Else
+                    moneyToInvest = dividendsMoney / stocksToPick
+                End If
+
+                For Each di In valueIndices.OrderByDescending(Function(vi) vi.Value).Take(stocksToPick)
+                    addedStockAmount = moneyToInvest / dataSets(di.Index)(i).Open
+                    tempInvest -= moneyToInvest
+                    results(di.Index).StockAmount += addedStockAmount
+                    results(di.Index).AddLogEntry("Added {0:n2} monthly stocks ({1}), new amount {2:n2}", addedStockAmount, currentStockData.Date.ToString("MMM yyyy"), results(di.Index).StockAmount)
+                Next
+
+
+                If tempInvest < 0 Then
+                    Dim stophere = 1
+                End If
+
                 dividendsMoney = 0
             End If
 
@@ -103,6 +129,10 @@
                     dividendsIndex += 1
                     dividendIndieces(stocksList(n)) = dividendsIndex
                     dividendsBeforeTax = results(n).StockAmount * dividends.Amount
+
+                    If Not usedDividends.Add(dividends) Then
+                        Dim stopHere = 1
+                    End If
 
                     If dividendsBeforeTax > TAX_FREE_AMOUNT Then
                         dividendsAfterTax = TAX_FREE_AMOUNT + (dividendsBeforeTax - TAX_FREE_AMOUNT) * TAX_FREE_MULTIPLIER
@@ -125,12 +155,14 @@
                 End If
             Next
 
-
         Next
 
         For n As Integer = 0 To results.Count - 1
             results(n).CurrentInvestmentValue = results(n).StockAmount * dataSets(n).Last.Close
         Next
+
+
+        Dim overall = results.Select(Function(sr) sr.Invested).Sum
 
         Return results
     End Function
