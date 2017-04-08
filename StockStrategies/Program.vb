@@ -35,6 +35,8 @@ Module Program
         Dim resultDaimler = invest.ReinvestDividends(daimler, 10000, 1200)
         Dim resultBasf = invest.ReinvestDividends(basf, 10000, 1200)
         Dim resultBmw = invest.ReinvestDividends(bmw, 10000, 1200)
+        Dim resultVw = invest.ReinvestDividends(vw, 10000, 1200)
+
 
         'Dim momrs = momentum.InvestMonthlySelectMaximumMomentum({daimler, basf, bmw}, 10000, 1200)
         'Dim momrsev = momentum.InvestMonthly({daimler, basf, bmw}, 10000, 1200)
@@ -50,158 +52,36 @@ Module Program
         Dim dividendsResults As New List(Of IEnumerable(Of StrategyResult))
 
         Dim startDate As Date = DateSerial(2000, 1, 1)
+        Dim investmentPerMonth As Double = 600
+        Dim resultSets As New Dictionary(Of String, IEnumerable(Of StrategyResult))
 
         divinvest.StartDate = startDate
         momentum.StartDate = startDate
 
-        For i As Integer = 0 To 4000 Step 130
+        For i As Integer = 0 To 520 Step 13
             momentum.StepSize = i
             divinvest.StepSize = i
-            dividendsResults.Clear()
+            resultSets.Clear()
 
-            'Dim momrsa = momentum.InvestMonthlySelectMaximumMomentum(allStocks, 10000, 1200)
-            'Dim maxMomentum = momrsa.Select(Function(sr) sr.CurrentInvestmentValue).Sum
 
-            Dim maxMomentumReinvestResults = momentum.InvestMonthlyReinvestDividendsSelectMaximumMomentum(allStocks, 10000, 1200, 2)
-            Dim maxMomentumReinvest = maxMomentumReinvestResults.Select(Function(sr) sr.CurrentInvestmentValue).Sum
+            Dim momrseva = momentum.InvestMonthlyReinvestDividends(allStocks, 10000, investmentPerMonth)
+            Dim evenlyInvestment = momrseva.Select(Function(sr) sr.CurrentInvestmentValue).Sum
 
-            Dim minMomentumReinvestResults = momentum.InvestMonthlyReinvestDividendsSelectMinimumMomentum(allStocks, 10000, 1200, 2)
-            Dim minMomentumReinvest = minMomentumReinvestResults.Select(Function(sr) sr.CurrentInvestmentValue).Sum
+            resultSets("h") = momentum.InvestMonthlyReinvestDividendsSelectMaximumMomentum(allStocks, 10000, investmentPerMonth, 1)
+            resultSets("l") = momentum.InvestMonthlyReinvestDividendsSelectMinimumMomentum(allStocks, 10000, investmentPerMonth, 1)
 
             For n As Integer = 1 To 7 Step 1
-                dividendsResults.Add(divinvest.InvestMonthlyReinvestDividendsSelectMaximumDividend(allStocks, 10000, 1200, n))
+                resultSets("d" & n) = divinvest.InvestMonthlyReinvestDividendsSelectMaximumDividend(allStocks, 10000, investmentPerMonth, n)
             Next
 
-            'Dim maxDividendsResults = divinvest.InvestMonthlyReinvestDividendsSelectMaximumDividend(allStocks, 10000, 1200, 1)
-            'Dim maxDividends = maxDividendsResults.Select(Function(sr) sr.CurrentInvestmentValue).Sum
 
-            Dim momrseva = momentum.InvestMonthlyReinvestDividends(allStocks, 10000, 1200)
-            Dim evently = momrseva.Select(Function(sr) sr.CurrentInvestmentValue).Sum
+            Console.Write("e {0:n}", evenlyInvestment)
 
-            'Dim max3Momentum = momentum.InvestMonthlySelectMaximumMomentum(allStocks, 10000, 1200, 2)
-            'Dim maxMomentumN = max3Momentum.Select(Function(sr) sr.CurrentInvestmentValue).Sum
+            For Each kv In resultSets
+                Dim value = kv.Value.Select(Function(sr) sr.CurrentInvestmentValue).Sum
 
-            'Dim min3Momentum = momentum.InvestMonthlySelectMinimumMomentum(allStocks, 10000, 1200, 2)
-            'Dim min3Overall = min3Momentum.Select(Function(sr) sr.CurrentInvestmentValue).Sum
-
-            '  investedEvenly = momrseva.Select(Function(sr) sr.Invested).Sum
-            '  investedMax = momrsa.Select(Function(sr) sr.Invested).Sum
-            ' investedMin = momrsevai.Select(Function(sr) sr.Invested).Sum
-
-            ' Console.WriteLine("E {0:n0}, mh {1:n0}, mhR {2:n0}, mhN {3:n0}, ml {4:n0}, mNl {5:n0}, s {6:n0}", evently, maxMomentum, maxMomentumReinvest, maxMomentumN, overallei, min3Overall, i)
-
-
-            '   Console.WriteLine("E {0:n0}, max {1:n0}, min {2:n0}, s {3:n0}", evently, maxMomentumReinvest, minMomentumReinvest, i)
-
-            Console.Write("e {0:n}", evently)
-
-
-            Console.Write(", h ")
-
-            If maxMomentumReinvest > evently Then
-                Console.ForegroundColor = ConsoleColor.Green
-                Console.Write("{0:n0}", maxMomentumReinvest)
-
-                Console.ForegroundColor = ConsoleColor.Gray
-                Console.Write(" (")
-                Console.ForegroundColor = ConsoleColor.Green
-                Console.Write("{0:n2}", (maxMomentumReinvest / evently).AsHumanReadablePercent)
-                Console.ForegroundColor = ConsoleColor.Gray
-                Console.Write(")")
-            Else
-                Console.ForegroundColor = ConsoleColor.Red
-                Console.Write("{0:n0}", maxMomentumReinvest)
-
-                Console.ForegroundColor = ConsoleColor.Gray
-                Console.Write(" (")
-                Console.ForegroundColor = ConsoleColor.Red
-                Console.Write("{0:n2}", (maxMomentumReinvest / evently).AsHumanReadablePercent)
-                Console.ForegroundColor = ConsoleColor.Gray
-                Console.Write(")")
-            End If
-
-            Console.ForegroundColor = ConsoleColor.Gray
-            Console.Write(", l ")
-
-            If minMomentumReinvest > evently Then
-                Console.ForegroundColor = ConsoleColor.Green
-                Console.Write("{0:n0}", minMomentumReinvest)
-
-                Console.ForegroundColor = ConsoleColor.Gray
-                Console.Write(" (")
-                Console.ForegroundColor = ConsoleColor.Green
-                Console.Write("{0:n2}", (minMomentumReinvest / evently).AsHumanReadablePercent)
-                Console.ForegroundColor = ConsoleColor.Gray
-                Console.Write(")")
-
-            Else
-                Console.ForegroundColor = ConsoleColor.Red
-                Console.Write("{0:n0}", minMomentumReinvest)
-
-                Console.ForegroundColor = ConsoleColor.Gray
-                Console.Write(" (")
-                Console.ForegroundColor = ConsoleColor.Red
-                Console.Write("{0:n2}", (minMomentumReinvest / evently).AsHumanReadablePercent)
-                Console.ForegroundColor = ConsoleColor.Gray
-                Console.Write(")")
-            End If
-
-
-            For Each divResults In dividendsResults
-                Dim maxDividends = divResults.Select(Function(sr) sr.CurrentInvestmentValue).Sum
-
-                Console.ForegroundColor = ConsoleColor.Gray
-                Console.Write(", d ") '" & vbTab & "
-
-                If maxDividends > evently Then
-                    Console.ForegroundColor = ConsoleColor.Green
-                    Console.Write("{0:n0}", maxDividends)
-
-                    Console.ForegroundColor = ConsoleColor.Gray
-                    Console.Write(" (")
-                    Console.ForegroundColor = ConsoleColor.Green
-                    Console.Write("{0:n2}", (maxDividends / evently).AsHumanReadablePercent)
-                    Console.ForegroundColor = ConsoleColor.Gray
-                    Console.Write(")")
-
-                Else
-                    Console.ForegroundColor = ConsoleColor.Red
-                    Console.Write("{0:n0}", maxDividends)
-
-                    Console.ForegroundColor = ConsoleColor.Gray
-                    Console.Write(" (")
-                    Console.ForegroundColor = ConsoleColor.Red
-                    Console.Write("{0:n2}", (maxDividends / evently).AsHumanReadablePercent)
-                    Console.ForegroundColor = ConsoleColor.Gray
-                    Console.Write(")")
-                End If
+                PrettyPrint(kv.Key, evenlyInvestment, value)
             Next
-
-            'Console.ForegroundColor = ConsoleColor.Gray
-            'Console.Write(", " & vbTab & "div ")
-
-            'If maxDividends > evently Then
-            '    Console.ForegroundColor = ConsoleColor.Green
-            '    Console.Write("{0:n0}", maxDividends)
-
-            '    Console.ForegroundColor = ConsoleColor.Gray
-            '    Console.Write(" (")
-            '    Console.ForegroundColor = ConsoleColor.Green
-            '    Console.Write("{0:n2}", (maxDividends / evently).AsHumanReadablePercent)
-            '    Console.ForegroundColor = ConsoleColor.Gray
-            '    Console.Write(")")
-
-            'Else
-            '    Console.ForegroundColor = ConsoleColor.Red
-            '    Console.Write("{0:n0}", maxDividends)
-
-            '    Console.ForegroundColor = ConsoleColor.Gray
-            '    Console.Write(" (")
-            '    Console.ForegroundColor = ConsoleColor.Red
-            '    Console.Write("{0:n2}", (maxDividends / evently).AsHumanReadablePercent)
-            '    Console.ForegroundColor = ConsoleColor.Gray
-            '    Console.Write(")")
-            'End If
 
             Console.ForegroundColor = ConsoleColor.Gray
             Console.Write(", ")
@@ -220,6 +100,34 @@ Module Program
         Dim ka2 = results.OrderByDescending(Function(sr) sr.CurrentInvestmentValue).Select(Function(sr)
                                                                                                Return New With {.Name = sr.Stock.MetaData.Name, .Dividends = sr.GainedDividends, .Value = sr.CurrentInvestmentValue}
                                                                                            End Function).ToList
+    End Sub
+
+    Public Sub PrettyPrint(caption As String, evenly As Double, comparsionValue As Double)
+        Console.ForegroundColor = ConsoleColor.Gray
+        Console.Write(", {0} ", caption)
+
+        If comparsionValue > evenly Then
+            Console.ForegroundColor = ConsoleColor.Green
+            Console.Write("{0:n0}", comparsionValue)
+
+            Console.ForegroundColor = ConsoleColor.Gray
+            Console.Write(" (")
+            Console.ForegroundColor = ConsoleColor.Green
+            Console.Write("{0:n2}", (comparsionValue / evenly).AsHumanReadablePercent)
+            Console.ForegroundColor = ConsoleColor.Gray
+            Console.Write(")")
+
+        Else
+            Console.ForegroundColor = ConsoleColor.Red
+            Console.Write("{0:n0}", comparsionValue)
+
+            Console.ForegroundColor = ConsoleColor.Gray
+            Console.Write(" (")
+            Console.ForegroundColor = ConsoleColor.Red
+            Console.Write("{0:n2}", (comparsionValue / evenly).AsHumanReadablePercent)
+            Console.ForegroundColor = ConsoleColor.Gray
+            Console.Write(")")
+        End If
     End Sub
 
     Public Function Normalize(json As String) As String
