@@ -39,14 +39,14 @@
     "StooqTicker": "bayn.de",
     "DataFileName": "bayn.de.txt"
   },
-  {
-    "Name": "Infineon",
-    "WKN": "623100",
-    "ISIN": "DE0006231004",
-    "ArivaName": "infineon",
-    "StooqTicker": "ifx.de",
-    "DataFileName": "ifx.de.txt"
-  },
+  //{
+  //  "Name": "Infineon",
+  //  "WKN": "623100",
+  //  "ISIN": "DE0006231004",
+  //  "ArivaName": "infineon",
+  //  "StooqTicker": "ifx.de",
+  //  "DataFileName": "ifx.de.txt"
+  //},
   {
     "Name": "Adidas",
     "WKN": "A1EWWW",
@@ -103,14 +103,14 @@
     "StooqTicker": "dpw.de",
     "DataFileName": "dpw.de.txt"
   },
-  {
-    "Name": "ProSiebenSat.1 Media",
-    "WKN": "PSM777",
-    "ISIN": "DE000PSM7770",
-    "ArivaName": "prosiebensat.1_media",
-    "StooqTicker": "psm.de",
-    "DataFileName": "psm.de.txt"
-  },
+  //{
+  //  "Name": "ProSiebenSat.1 Media",
+  //  "WKN": "PSM777",
+  //  "ISIN": "DE000PSM7770",
+  //  "ArivaName": "prosiebensat.1_media",
+  //  "StooqTicker": "psm.de",
+  //  "DataFileName": "psm.de.txt"
+  //},
   {
     "Name": "Siemens",
     "WKN": "723610",

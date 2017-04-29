@@ -15,7 +15,7 @@ Module Program
 
         CreateAllDirectories()
 
-        metac = StockMetaDataCollection.ReadFromFile("germanhandpicked.json")
+        metac = StockMetaDataCollection.ReadFromFile("german.json")
 
         Dim allStocks As New List(Of Stock)
 
@@ -58,7 +58,7 @@ Module Program
         divinvest.StartDate = startDate
         momentum.StartDate = startDate
 
-        For i As Integer = 0 To 520 Step 13
+        For i As Integer = 0 To 780 Step 13
             momentum.StepSize = i
             divinvest.StepSize = i
             resultSets.Clear()
@@ -70,8 +70,11 @@ Module Program
             resultSets("h") = momentum.InvestMonthlyReinvestDividendsSelectMaximumMomentum(allStocks, 10000, investmentPerMonth, 1)
             resultSets("l") = momentum.InvestMonthlyReinvestDividendsSelectMinimumMomentum(allStocks, 10000, investmentPerMonth, 1)
 
-            For n As Integer = 1 To 7 Step 1
-                resultSets("d" & n) = divinvest.InvestMonthlyReinvestDividendsSelectMaximumDividend(allStocks, 10000, investmentPerMonth, n)
+            For n As Integer = 1 To 3 Step 1
+                '   resultSets("h" & n) = momentum.InvestMonthlyReinvestDividendsSelectMaximumMomentum(allStocks, 10000, investmentPerMonth, n)
+                '   resultSets("l" & n) = momentum.InvestMonthlyReinvestDividendsSelectMinimumMomentum(allStocks, 10000, investmentPerMonth, n)
+                resultSets("dh" & n) = divinvest.InvestMonthlyReinvestDividendsSelectMaximumDividend(allStocks, 10000, investmentPerMonth, n)
+                resultSets("dl" & n) = divinvest.InvestMonthlyReinvestDividendsSelectMinimumDividend(allStocks, 10000, investmentPerMonth, n)
             Next
 
 
@@ -91,6 +94,8 @@ Module Program
 
             '  addedStocks.Add(String.Join(", ", maxDividendsResults.Where(Function(r) r.StockAmount > 0).Select(Function(r) r.Stock.MetaData.Name)))
         Next
+
+        'antizyklisch investieren (ginmo)
 
         Dim ka = results.OrderByDescending(Function(sr) sr.GainedDividends).Select(Function(sr)
                                                                                        Return New With {.Name = sr.Stock.MetaData.Name, .Dividends = sr.GainedDividends, .Value = sr.CurrentInvestmentValue}
