@@ -4,6 +4,205 @@ Imports Newtonsoft.Json.Linq
 
 Module Program
 
+    Sub Doppelte()
+        Dim book As New Book
+
+        book.AddAccount("Kassenbestand", Account.TypeE.Active, 10000.0)
+        book.AddAccount("Steuern", Account.TypeE.Active, 0.0)
+        book.AddAccount("Wertpapiere", Account.TypeE.Active, 0.0)
+
+        book.AddAccount("Kapital", Account.TypeE.Passive, 10000.0)
+    End Sub
+
+    Sub Snp()
+        Dim sdc As StockDataCollection = StockDataCollection.ReadFromStooqFile(IO.Path.Combine(GetStooqDirectory(), "snp.txt"))
+        Dim early, late As StockData
+        Dim factor As Double
+        Dim factors As New Dictionary(Of Integer, Double)
+        Dim stepSize As Integer = 260
+        Dim startDate As Date = DateSerial(1960, 1, 1)
+        Dim data = sdc.FilterByMinimumStartDate(startDate)
+
+
+        For i As Integer = stepSize To data.Count - 1
+            early = data(i - stepSize)
+            late = data(i)
+            factor = late.Close / early.Open
+            factors(i) = factor
+        Next
+
+        Dim highestFalls = From x In factors Order By x.Value
+        Dim highestRise = From x In factors Order By x.Value Descending
+    End Sub
+
+    Public Sub ThreeToOne()
+        Dim outputNeuron As Neuron
+        Dim inputNeuron As InputNeuron
+        Dim inputNeurons As New List(Of INeuron)
+        Dim rnd As New Random(24)
+        Dim datas As New List(Of Double())
+        Dim resultSet(2) As Double
+        Dim labels As New List(Of Integer)
+        Dim index As Integer
+        Dim current As Double()
+        Dim hits As Integer
+        Dim result As Double
+
+        datas.Add({1.2, 0.7}) : labels.Add(1)
+        datas.Add({-0.3, -0.5}) : labels.Add(-1)
+        datas.Add({3.0, 0.1}) : labels.Add(1)
+        datas.Add({-0.1, -1.0}) : labels.Add(-1)
+        datas.Add({-1.0, 1.1}) : labels.Add(-1)
+        datas.Add({2.1, -3.0}) : labels.Add(1)
+
+        For i As Integer = 1 To 3
+            inputNeuron = New InputNeuron(2)
+
+            For n As Integer = 1 To 2
+                inputNeuron.Weights(n - 1) = rnd.NextDouble * 2 - 1.0
+            Next
+
+            inputNeurons.Add(inputNeuron)
+        Next
+
+        outputNeuron = New Neuron(3)
+
+        For n As Integer = 1 To 3
+            outputNeuron.Weights(n - 1) = rnd.NextDouble * 2 - 1.0
+        Next
+
+
+        For i As Integer = 1 To 4000000
+            index = rnd.Next(datas.Count)
+            current = datas(index)
+
+            outputNeuron.Clear()
+            resultSet(0) = inputNeurons(0).Forward(current)
+            resultSet(1) = inputNeurons(1).Forward(current)
+            resultSet(2) = inputNeurons(2).Forward(current)
+
+            result = outputNeuron.Forward(resultSet)
+
+            If labels(index) = 1 AndAlso result < 1 Then
+                outputNeuron.Backward(1.0)
+
+            ElseIf labels(index) = -1 AndAlso result > -1 Then
+                outputNeuron.Backward(-1.0)
+
+            Else
+                outputNeuron.Backward(0.0)
+            End If
+
+            '  outputNeuron.Regularize()
+            outputNeuron.UpdateWeightsAdam(0.01)
+            hits = 0
+
+            For n As Integer = 0 To datas.Count - 1
+                current = datas(n)
+                resultSet(0) = inputNeurons(0).Forward(current)
+                resultSet(1) = inputNeurons(1).Forward(current)
+                resultSet(2) = inputNeurons(2).Forward(current)
+
+                result = outputNeuron.Forward(resultSet)
+
+                If labels(n) = 1 AndAlso result > 0 Then
+                    hits += 1
+
+                ElseIf labels(n) = -1 AndAlso result <= 0 Then
+                    hits += 1
+                End If
+            Next
+
+            If hits = 6 Then
+                Dim stopHere = 1
+            End If
+
+
+            If i Mod 50 = 0 Then
+                Console.WriteLine(hits)
+            End If
+        Next
+    End Sub
+
+    Public Sub ThreeToOneLayer()
+        Dim inputLayer As New InputLayer(2, 9)
+        Dim reluLayer As ReluLayer = inputLayer.CreateReluLayer()
+        Dim hiddenLayer As NeuronLayer = reluLayer.CreateNeuronLayer(1)
+        Dim rnd As New Random(24)
+        Dim datas As New List(Of Double())
+        Dim resultSet(2) As Double
+        Dim labels As New List(Of Integer)
+        Dim index As Integer
+        Dim current, inputResult, reluResult, hiddenResult As Double()
+        Dim hits As Integer
+        Dim result As Double
+
+        datas.Add({1.2, 0.7}) : labels.Add(1)
+        datas.Add({-0.3, -0.5}) : labels.Add(-1)
+        datas.Add({3.0, 0.1}) : labels.Add(1)
+        datas.Add({-0.1, -1.0}) : labels.Add(-1)
+        datas.Add({-1.0, 1.1}) : labels.Add(-1)
+        datas.Add({2.1, -3.0}) : labels.Add(1)
+
+
+        inputLayer.Randomize(rnd)
+        hiddenLayer.Randomize(rnd)
+
+
+        For i As Integer = 1 To 4000000
+            index = rnd.Next(datas.Count)
+            current = datas(index)
+
+            inputLayer.Clear()
+            hiddenLayer.Clear()
+
+
+            inputResult = inputLayer.Forward(current)
+            reluResult = reluLayer.Forward(current)
+            hiddenResult = hiddenLayer.Forward(reluResult)
+            result = hiddenResult(0)
+
+            If labels(index) = 1 AndAlso result < 1 Then
+                hiddenLayer.Backward({1.0})
+
+            ElseIf labels(index) = -1 AndAlso result > -1 Then
+                hiddenLayer.Backward({-1.0})
+
+            Else
+                hiddenLayer.Backward({0.0})
+            End If
+
+            hiddenLayer.UpdateWeights(0.01)
+            '  outputNeuron.Regularize()
+            '    outputNeuron.UpdateWeightsAdam(0.01)
+            hits = 0
+
+            For n As Integer = 0 To datas.Count - 1
+                current = datas(n)
+                inputResult = inputLayer.Forward(current)
+                reluResult = reluLayer.Forward(current)
+                hiddenResult = hiddenLayer.Forward(reluResult)
+                result = hiddenResult(0)
+
+                If labels(n) = 1 AndAlso result > 0 Then
+                    hits += 1
+
+                ElseIf labels(n) = -1 AndAlso result <= 0 Then
+                    hits += 1
+                End If
+            Next
+
+            If hits = 6 Then
+                Dim stopHere = 1
+            End If
+
+
+            If i Mod 50 = 0 Then
+                Console.WriteLine(hits)
+            End If
+        Next
+    End Sub
+
     Sub Main()
         Dim invest As New InvestMonthlyStrategy
         Dim momentum As New MomentumStrategy
@@ -13,7 +212,10 @@ Module Program
         Dim sd As String
         Dim s As Stock
 
+        ThreeToOneLayer()
         CreateAllDirectories()
+        Snp()
+        '     Dim snp = loader.DownloadStooqData("^spx")
 
         metac = StockMetaDataCollection.ReadFromFile("german.json")
 
