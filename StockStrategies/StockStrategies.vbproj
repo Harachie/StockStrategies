@@ -84,9 +84,12 @@
     <Compile Include="Code\Neural\Interfaces\ILayer.vb" />
     <Compile Include="Code\Neural\Interfaces\INeuron.vb" />
     <Compile Include="Code\Neural\InputNeuron.vb" />
+    <Compile Include="Code\Neural\NeuralNetwork.vb" />
     <Compile Include="Code\Neural\Neuron.vb" />
     <Compile Include="Code\Neural\NeuronLayer.vb" />
     <Compile Include="Code\Neural\ReluLayer.vb" />
+    <Compile Include="Code\Neural\Simple\Gates.vb" />
+    <Compile Include="Code\Neural\TanhLayer.vb" />
     <Compile Include="Code\SimpleSavings\EnduringInvestment.vb" />
     <Compile Include="Code\Stocks\Dividend.vb" />
     <Compile Include="Code\Stocks\StockMetaData.vb" />

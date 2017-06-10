@@ -16,24 +16,29 @@
         Next
     End Sub
 
-    Public Function CreateNeuronLayer(outputs As Integer) As NeuronLayer
+    Public Function CreateNeuronLayer(outputs As Integer) As NeuronLayer Implements ILayer.CreateNeuronLayer
         Return New NeuronLayer(Me.Outputs, outputs, Me)
     End Function
 
-    Public Function CreateReluLayer() As ReluLayer
+    Public Function CreateReluLayer() As ReluLayer Implements ILayer.CreateReluLayer
         Return New ReluLayer(Me.Outputs, Me)
     End Function
 
-    Public Sub Randomize(rnd As Random)
+    Public Function CreateTanhLayer() As TanhLayer Implements ILayer.CreateTahLayer 'das macht im relulayer wenig sinn... aber naja
+        Return New TanhLayer(Me.Outputs, Me)
+    End Function
+
+    Public Sub Randomize(rnd As Random) Implements ILayer.Randomize
         For Each neuron In Me.Neurons
             For i As Integer = 0 To neuron.Weights.Length - 1
                 neuron.Weights(i) = rnd.NextDouble * 2.0 - 1.0
+                Console.WriteLine(neuron.Weights(i))
             Next
         Next
     End Sub
 
     Public Function Forward(inputs As Double()) As Double() Implements ILayer.Forward
-        Dim r(Me.Inputs - 1) As Double
+        Dim r(Me.Outputs - 1) As Double
 
         For i As Integer = 0 To Me.Outputs - 1
             r(i) = Me.Neurons(i).Forward(inputs)
@@ -49,7 +54,7 @@
             Me.Neurons(i).Backward(adjustInDirection(i))
 
             For n As Integer = 0 To Me.Inputs - 1
-                r(n) += Me.Neurons(i).LocalInputGradients(n) * adjustInDirection(i)
+                r(n) += Me.Neurons(i).InputGradients(n) * adjustInDirection(i)
             Next
         Next
 
@@ -62,6 +67,14 @@
         Next
 
         Me.PreviousLayer.UpdateWeights(learningRate)
+    End Sub
+
+    Public Sub UpdateWeightsAdam(learningRate As Double) Implements ILayer.UpdateWeightsAdam
+        For i As Integer = 0 To Me.Outputs - 1
+            Me.Neurons(i).UpdateWeightsAdam(learningRate)
+        Next
+
+        Me.PreviousLayer.UpdateWeightsAdam(learningRate)
     End Sub
 
     Public Sub Clear() Implements ILayer.Clear

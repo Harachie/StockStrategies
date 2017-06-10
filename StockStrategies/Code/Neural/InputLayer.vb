@@ -16,18 +16,23 @@ Public Class InputLayer
         Next
     End Sub
 
-    Public Function CreateNeuronLayer(outputs As Integer) As NeuronLayer
+    Public Function CreateNeuronLayer(outputs As Integer) As NeuronLayer Implements ILayer.CreateNeuronLayer
         Return New NeuronLayer(Me.Outputs, outputs, Me)
     End Function
 
-    Public Function CreateReluLayer() As ReluLayer
+    Public Function CreateReluLayer() As ReluLayer Implements ILayer.CreateReluLayer
         Return New ReluLayer(Me.Outputs, Me)
     End Function
 
-    Public Sub Randomize(rnd As Random)
+    Public Function CreateTanhLayer() As TanhLayer Implements ILayer.CreateTahLayer
+        Return New TanhLayer(Me.Outputs, Me)
+    End Function
+
+    Public Sub Randomize(rnd As Random) Implements ILayer.Randomize
         For Each neuron In Me.Neurons
             For i As Integer = 0 To neuron.Weights.Length - 1
                 neuron.Weights(i) = rnd.NextDouble * 2.0 - 1.0
+                Console.WriteLine(neuron.Weights(i))
             Next
         Next
     End Sub
@@ -51,6 +56,12 @@ Public Class InputLayer
     Public Sub UpdateWeights(learningRate As Double) Implements ILayer.UpdateWeights
         For i As Integer = 0 To Me.Outputs - 1
             Me.Neurons(i).UpdateWeights(learningRate)
+        Next
+    End Sub
+
+    Public Sub UpdateWeightsAdam(learningRate As Double) Implements ILayer.UpdateWeightsAdam
+        For i As Integer = 0 To Me.Outputs - 1
+            Me.Neurons(i).UpdateWeightsAdam(learningRate)
         Next
     End Sub
 

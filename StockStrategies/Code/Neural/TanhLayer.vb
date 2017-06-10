@@ -1,6 +1,4 @@
-﻿Imports StockStrategies
-
-Public Class ReluLayer
+﻿Public Class TanhLayer
     Implements ILayer
 
     Public Property Inputs As Integer
@@ -31,15 +29,13 @@ Public Class ReluLayer
 
     Public Function Forward(inputs As Double()) As Double() Implements ILayer.Forward
         Dim r(Me.Inputs - 1) As Double
+        Dim t As Double
 
         For i As Integer = 0 To Me.Inputs - 1
-            r(i) = Math.Max(0.0, inputs(i))
+            t = Math.Tanh(inputs(i))
+            r(i) = t
 
-            If r(i) = 0.0 Then
-                Me.Gradients(i) = 0
-            Else
-                Me.Gradients(i) = 1
-            End If
+            Me.Gradients(i) = (1.0 + t) * (1.0 - t)
         Next
 
         Return r

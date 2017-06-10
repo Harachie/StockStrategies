@@ -9,6 +9,7 @@
     Public Property Velocity As Double()
     Public Property LocalWeightGradients As Double()
     Public Property WeightGradients As Double()
+    Public Property InputGradients As Double()
 
     Public Sub New(inputs As Integer)
         Me.Inputs = inputs
@@ -19,6 +20,7 @@
         ReDim Me.LocalWeightGradients(inputs)
         ReDim Me.WeightGradients(inputs)
         ReDim Me.LocalInputGradients(inputs - 1)
+        ReDim Me.InputGradients(inputs - 1)
 
         Me.Weights(inputs) = 0.01
     End Sub
@@ -31,7 +33,7 @@
 
         For i As Integer = 0 To Me.Inputs - 1
             Me.LocalInputGradients(i) = 0.0
-            '   Me.InputNeurons(i).Clear()
+            Me.InputGradients(i) = 0.0
         Next
 
         Me.LocalWeightGradients(Me.Inputs) = 1.0 'das add gate vom bias hat immer 1 als gradient
@@ -54,15 +56,14 @@
             Me.WeightGradients(i) += Me.LocalWeightGradients(i) * adjustInDirection
         Next
 
-        'For i As Integer = 0 To Me.Inputs - 1
-        '    Me.InputNeurons(i).Backward(Me.LocalInputGradients(i) * adjustInDirection)
-        'Next
+        For i As Integer = 0 To Me.Inputs - 1
+            Me.InputGradients(i) += Me.LocalInputGradients(i) * adjustInDirection
+        Next
     End Sub
 
     Public Sub Regularize() Implements INeuron.Regularize
         For i As Integer = 0 To Me.Inputs - 1 'das bias nicht regulieren
             Me.WeightGradients(i) -= Me.Weights(i)
-            '  Me.InputNeurons(i).Regularize()
         Next
     End Sub
 
@@ -70,10 +71,6 @@
         For i As Integer = 0 To Me.Inputs
             Me.Weights(i) += Me.WeightGradients(i) * stepSize
         Next
-
-        'For i As Integer = 0 To Me.Inputs - 1 'das bias nicht regulieren
-        '    Me.InputNeurons(i).UpdateWeights(stepSize)
-        'Next
     End Sub
 
     Public Sub UpdateWeightsAdam(stepSize As Double) Implements INeuron.UpdateWeightsAdam
@@ -82,10 +79,6 @@
             Me.Velocity(i) = VelocityBeta * Me.Velocity(i) + (1.0 - VelocityBeta) * Me.WeightGradients(i) * Me.WeightGradients(i)
             Me.Weights(i) += stepSize * Me.Momentum(i) / (Math.Sqrt(Me.Velocity(i)) + ZeroDivisor)
         Next
-
-        'For i As Integer = 0 To Me.Inputs - 1 'das bias nicht regulieren
-        '    Me.InputNeurons(i).UpdateWeightsAdam(stepSize)
-        'Next
     End Sub
 
 End Class

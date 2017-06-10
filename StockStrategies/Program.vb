@@ -41,21 +41,26 @@ Module Program
         Dim inputNeurons As New List(Of INeuron)
         Dim rnd As New Random(24)
         Dim datas As New List(Of Double())
-        Dim resultSet(2) As Double
+        Dim resultSet(100) As Double
         Dim labels As New List(Of Integer)
         Dim index As Integer
         Dim current As Double()
         Dim hits As Integer
         Dim result As Double
 
-        datas.Add({1.2, 0.7}) : labels.Add(1)
-        datas.Add({-0.3, -0.5}) : labels.Add(-1)
-        datas.Add({3.0, 0.1}) : labels.Add(1)
-        datas.Add({-0.1, -1.0}) : labels.Add(-1)
-        datas.Add({-1.0, 1.1}) : labels.Add(-1)
-        datas.Add({2.1, -3.0}) : labels.Add(1)
+        'datas.Add({1.2, 0.7}) : labels.Add(1)
+        'datas.Add({-0.3, -0.5}) : labels.Add(-1)
+        'datas.Add({3.0, 0.1}) : labels.Add(1)
+        'datas.Add({-0.1, -1.0}) : labels.Add(-1)
+        'datas.Add({-1.0, 1.1}) : labels.Add(-1)
+        'datas.Add({2.1, -3.0}) : labels.Add(1)
 
-        For i As Integer = 1 To 3
+        datas.Add({0, 0}) : labels.Add(-1)
+        datas.Add({0, 1}) : labels.Add(1)
+        datas.Add({1, 0}) : labels.Add(1)
+        datas.Add({1, 1}) : labels.Add(-1)
+
+        For i As Integer = 1 To 5
             inputNeuron = New InputNeuron(2)
 
             For n As Integer = 1 To 2
@@ -65,9 +70,9 @@ Module Program
             inputNeurons.Add(inputNeuron)
         Next
 
-        outputNeuron = New Neuron(3)
+        outputNeuron = New Neuron(inputNeurons.Count)
 
-        For n As Integer = 1 To 3
+        For n As Integer = 1 To inputNeurons.Count - 1
             outputNeuron.Weights(n - 1) = rnd.NextDouble * 2 - 1.0
         Next
 
@@ -77,9 +82,14 @@ Module Program
             current = datas(index)
 
             outputNeuron.Clear()
-            resultSet(0) = inputNeurons(0).Forward(current)
-            resultSet(1) = inputNeurons(1).Forward(current)
-            resultSet(2) = inputNeurons(2).Forward(current)
+
+            For n As Integer = 0 To inputNeurons.Count - 1
+                inputNeurons(n).Clear()
+            Next
+
+            For n As Integer = 0 To inputNeurons.Count - 1
+                resultSet(n) = inputNeurons(n).Forward(current)
+            Next
 
             result = outputNeuron.Forward(resultSet)
 
@@ -93,15 +103,22 @@ Module Program
                 outputNeuron.Backward(0.0)
             End If
 
-            '  outputNeuron.Regularize()
+            For n As Integer = 0 To inputNeurons.Count - 1
+                inputNeurons(n).Backward(outputNeuron.InputGradients(n))
+                inputNeurons(n).UpdateWeightsAdam(0.01)
+            Next
+
+            outputNeuron.Regularize()
             outputNeuron.UpdateWeightsAdam(0.01)
+
             hits = 0
 
             For n As Integer = 0 To datas.Count - 1
                 current = datas(n)
-                resultSet(0) = inputNeurons(0).Forward(current)
-                resultSet(1) = inputNeurons(1).Forward(current)
-                resultSet(2) = inputNeurons(2).Forward(current)
+
+                For ni As Integer = 0 To inputNeurons.Count - 1
+                    resultSet(ni) = inputNeurons(ni).Forward(current)
+                Next
 
                 result = outputNeuron.Forward(resultSet)
 
@@ -113,7 +130,7 @@ Module Program
                 End If
             Next
 
-            If hits = 6 Then
+            If hits = datas.Count Then
                 Dim stopHere = 1
             End If
 
@@ -125,7 +142,7 @@ Module Program
     End Sub
 
     Public Sub ThreeToOneLayer()
-        Dim inputLayer As New InputLayer(2, 9)
+        Dim inputLayer As New InputLayer(2, 3)
         Dim reluLayer As ReluLayer = inputLayer.CreateReluLayer()
         Dim hiddenLayer As NeuronLayer = reluLayer.CreateNeuronLayer(1)
         Dim rnd As New Random(24)
@@ -158,7 +175,7 @@ Module Program
 
 
             inputResult = inputLayer.Forward(current)
-            reluResult = reluLayer.Forward(current)
+            reluResult = reluLayer.Forward(inputResult)
             hiddenResult = hiddenLayer.Forward(reluResult)
             result = hiddenResult(0)
 
@@ -172,7 +189,9 @@ Module Program
                 hiddenLayer.Backward({0.0})
             End If
 
-            hiddenLayer.UpdateWeights(0.01)
+            ' inputLayer.Regularize()
+            ' hiddenLayer.Regularize()
+            hiddenLayer.UpdateWeightsAdam(0.01)
             '  outputNeuron.Regularize()
             '    outputNeuron.UpdateWeightsAdam(0.01)
             hits = 0
@@ -180,7 +199,7 @@ Module Program
             For n As Integer = 0 To datas.Count - 1
                 current = datas(n)
                 inputResult = inputLayer.Forward(current)
-                reluResult = reluLayer.Forward(current)
+                reluResult = reluLayer.Forward(inputResult)
                 hiddenResult = hiddenLayer.Forward(reluResult)
                 result = hiddenResult(0)
 
@@ -203,6 +222,539 @@ Module Program
         Next
     End Sub
 
+    Public Sub NetworkTest()
+        Dim nn As New NeuralNetwork(2)
+        Dim rnd As New Random(24)
+        Dim datas As New List(Of Double())
+        Dim resultSet(2) As Double
+        Dim labels As New List(Of Integer)
+        Dim index As Integer
+        Dim current, nnResult As Double()
+        Dim hits As Integer
+        Dim result As Double
+
+        'datas.Add({1.2, 0.7}) : labels.Add(1)
+        'datas.Add({-0.3, -0.5}) : labels.Add(-1)
+        'datas.Add({3.0, 0.1}) : labels.Add(1)
+        'datas.Add({-0.1, -1.0}) : labels.Add(-1)
+        'datas.Add({-1.0, 1.1}) : labels.Add(-1)
+        'datas.Add({2.1, -3.0}) : labels.Add(1)
+
+
+        datas.Add({0, 0}) : labels.Add(-1)
+        datas.Add({0, 1}) : labels.Add(1)
+        datas.Add({1, 0}) : labels.Add(1)
+        datas.Add({1, 1}) : labels.Add(-1)
+
+
+        nn.AddInputLayer(7)
+        '  nn.AddTanhLayer()
+        nn.AddReluLayer()
+        nn.AddNeuronLayer(3)
+        '   nn.AddReluLayer()
+        '    nn.AddNeuronLayer(2)
+        nn.AddReluLayer()
+        Dim lastLayer As NeuronLayer = CType(nn.AddFinalLayer(1, ILayer.LayerTypeE.FullyConnected), NeuronLayer)
+        nn.Randomize(rnd)
+        Console.WriteLine()
+
+        Dim err As Double
+
+        For i As Integer = 1 To 4000000
+            index = rnd.Next(datas.Count)
+            current = datas(index)
+
+            nn.Clear()
+            nnResult = nn.Forward(current)
+            result = nnResult(0)
+            err = labels(index) - result
+
+            If labels(index) = 1 AndAlso result < 1 Then
+                nn.Backward({1.0})
+
+            ElseIf labels(index) = -1 AndAlso result > -1 Then
+                nn.Backward({-1.0})
+
+            Else
+                nn.Backward({0.0})
+            End If
+
+            '   nn.Backward({err})
+            'nn.Regularize()
+            nn.UpdateWeightsAdam(0.01)
+
+            hits = 0
+
+            If i Mod 50 = 0 Then
+                Console.WriteLine(hits)
+            End If
+
+            If lastLayer.Neurons(0).Weights(0) > 5 OrElse lastLayer.Neurons(0).Weights(0) < -5 Then
+                Dim stopHere = 1
+            End If
+
+            For n As Integer = 0 To datas.Count - 1
+                current = datas(n)
+                nnResult = nn.Forward(current)
+                result = nnResult(0)
+
+                If labels(n) = 1 AndAlso result >= 0 Then
+                    hits += 1
+
+                ElseIf labels(n) = -1 AndAlso result <= 0 Then
+                    hits += 1
+                End If
+            Next
+
+            If hits = 6 Then
+                Dim stopHere = 1
+            End If
+
+
+        Next
+    End Sub
+
+    Public Sub NetworkTestXor()
+        Dim nn As New NeuralNetwork(2)
+        Dim rnd As New Random(24)
+        Dim datas As New List(Of Double())
+        Dim labels As New List(Of Integer)
+        Dim index As Integer
+        Dim current, nnResult As Double()
+        Dim hits As Integer
+        Dim result As Double
+
+        datas.Add({0, 0}) : labels.Add(-1)
+        datas.Add({0, 1}) : labels.Add(1)
+        datas.Add({1, 0}) : labels.Add(1)
+        datas.Add({1, 1}) : labels.Add(-1)
+
+
+        nn.AddInputLayer(5)
+        '   nn.AddNeuronLayer(2)
+        '    nn.AddReluLayer()
+        nn.AddFinalLayer(1, ILayer.LayerTypeE.FullyConnected)
+        nn.Randomize(rnd)
+        Console.WriteLine()
+
+        For i As Integer = 1 To 4000000
+            index = rnd.Next(datas.Count)
+            current = datas(index)
+
+            nn.Clear()
+            nnResult = nn.Forward(current)
+            result = nnResult(0)
+
+            If labels(index) = 1 AndAlso result < 1 Then
+                nn.Backward({1.0})
+
+            ElseIf labels(index) = -1 AndAlso result > -1 Then
+                nn.Backward({-1.0})
+
+            Else
+                nn.Backward({0.0})
+            End If
+
+            '  nn.Regularize()
+            nn.UpdateWeights(1)
+            Dim nnResult2 = nn.Forward(current)
+            Dim result2 = nnResult2(0)
+
+            hits = 0
+
+            For n As Integer = 0 To datas.Count - 1
+                current = datas(n)
+                nnResult = nn.Forward(current)
+                result = nnResult(0)
+
+                If labels(n) = 1 AndAlso result > 0 Then
+                    hits += 1
+
+                ElseIf labels(n) = -1 AndAlso result <= 0 Then
+                    hits += 1
+                End If
+            Next
+
+            If hits = 4 Then
+                Dim stopHere = 1
+            End If
+
+
+            If i Mod 50 = 0 Then
+                Console.WriteLine(hits)
+            End If
+        Next
+    End Sub
+
+    Public Sub NetworkTestSnp()
+        Dim nn As New NeuralNetwork(4)
+        Dim rnd As New Random(24)
+        Dim datas As New List(Of Double())
+        Dim labels As New List(Of Integer)
+        Dim index As Integer
+        Dim current, nnResult As Double()
+        Dim hits As Integer
+        Dim result As Double
+
+        Dim sdc As StockDataCollection = StockDataCollection.ReadFromStooqFile(IO.Path.Combine(GetStooqDirectory(), "snp.txt"))
+        Dim filtered = sdc.FilterByMinimumStartDate(DateSerial(2015, 1, 1))
+        Dim afterSell As Double
+        Dim compareBar, buyBar As StockData
+        Dim data As New List(Of Double)
+        Dim positiveL, negativeL As Integer
+
+
+        For i As Integer = 260 To filtered.Count - 132
+            data.Clear()
+            compareBar = filtered(i)
+            buyBar = filtered(i + 1)
+            afterSell = filtered(i + 131).Close / buyBar.Close - 1.0
+
+            data.Add(compareBar.Close / filtered(i - 260).Close - 1.0)
+            data.Add(compareBar.Close / filtered(i - 195).Close - 1.0)
+            data.Add(compareBar.Close / filtered(i - 130).Close - 1.0)
+            data.Add(compareBar.Close / filtered(i - 65).Close - 1.0)
+
+            datas.Add(data.ToArray)
+
+            If afterSell > 0.1 Then
+                labels.Add(1)
+                positiveL += 1
+            Else
+                labels.Add(-1)
+                negativeL += 1
+            End If
+        Next
+
+        nn.AddInputLayer(3)
+        nn.AddReluLayer()
+        nn.AddFinalLayer(1, ILayer.LayerTypeE.FullyConnected)
+        nn.Randomize(rnd)
+        Console.WriteLine()
+
+        For i As Integer = 1 To 4000000
+            index = rnd.Next(datas.Count)
+            current = datas(index)
+
+            nn.Clear()
+            nnResult = nn.Forward(current)
+            result = nnResult(0)
+
+            If labels(index) = 1 AndAlso result < 1 Then
+                nn.Backward({1.0})
+
+            ElseIf labels(index) = -1 AndAlso result > -1 Then
+                nn.Backward({-1.0})
+
+            Else
+                nn.Backward({0.0})
+            End If
+
+            If i Mod 20 = 0 Then
+
+            End If
+
+            '  nn.Regularize()
+            nn.UpdateWeightsAdam(0.01)
+
+            hits = 0
+
+            For n As Integer = 0 To datas.Count - 1
+                current = datas(n)
+                nnResult = nn.Forward(current)
+                result = nnResult(0)
+
+                If labels(n) = 1 AndAlso result > 0 Then
+                    hits += 1
+
+                ElseIf labels(n) = -1 AndAlso result <= 0 Then
+                    hits += 1
+                End If
+            Next
+
+
+            If i Mod 50 = 0 Then
+                Console.WriteLine("{0:n0} {1:n3}", hits, hits / datas.Count)
+            End If
+        Next
+    End Sub
+
+
+    Public Sub TestTanh()
+        Dim x As New TanhGate
+        Dim result As Double
+
+        x.Input = 10.0
+
+        For i As Integer = 1 To 40
+            x.Clear()
+            result = x.Forward(x.Input)
+            x.Backward(1)
+            x.Update(0.01)
+            'Console.WriteLine(result)
+        Next
+    End Sub
+
+    Public Sub TestBias()
+        Dim x As New AddBiasGate
+        Dim result As Double
+
+        x.Bias = 10.0
+
+        For i As Integer = 1 To 40
+            x.Clear()
+            result = x.Forward(5)
+            x.Backward(-1)
+            x.Update(0.01)
+            Console.WriteLine(result)
+        Next
+    End Sub
+
+    Public Sub TestSigmoid()
+        Dim x As New SigmoidGate
+        Dim result As Double
+
+        x.Input = 0.5
+
+        For i As Integer = 1 To 40
+            x.Clear()
+            result = x.Forward(x.Input)
+            x.Backward(-1)
+            x.Update(0.01)
+            '  Console.WriteLine(x.Input)
+        Next
+    End Sub
+
+    Public Sub TestRelu()
+        Dim x As New ReluGate
+        Dim result As Double
+
+        x.Input = 10.0
+
+        For i As Integer = 1 To 40
+            x.Clear()
+            result = x.Forward(x.Input)
+            x.Backward(-1)
+            x.Update(0.01)
+            ' Console.WriteLine(result)
+        Next
+    End Sub
+
+    Public Sub TestXor()
+        Dim one As Double() = {1, 1}
+        Dim two As Double() = {1, 0}
+        Dim three As Double() = {0, 1}
+        Dim four As Double() = {0, 0}
+        Dim x, y As Double
+
+        Dim w1 As New MultiplyWeightGate With {.Weight = -0.5}
+        Dim w2 As New MultiplyWeightGate With {.Weight = -0.7}
+        Dim addw1w2 As New AddGate
+        Dim bias1 As New AddBiasGate With {.Bias = -0.4}
+
+        Dim w3 As New MultiplyWeightGate With {.Weight = 0.2}
+        Dim w4 As New MultiplyWeightGate With {.Weight = -0.1}
+        Dim addw3w4 As New AddGate
+        Dim bias2 As New AddBiasGate With {.Bias = 0.2}
+
+        Dim w5 As New MultiplyWeightGate With {.Weight = -0.8}
+        Dim w6 As New MultiplyWeightGate With {.Weight = 0.2}
+        Dim addw5w6 As New AddGate
+        Dim bias3 As New AddBiasGate With {.Bias = 0.1}
+
+        Dim addb1b2 As New AddGate
+        Dim addb1b2b3 As New AddGate
+        Dim wOut As New MultiplyWeightGate With {.Weight = 0.3}
+        Dim biasOut As New AddBiasGate With {.Bias = -0.1}
+
+
+        Dim result, b1Result, b2Result, b3Result, err As Double
+        Dim learningRate As Double = 0.01
+        Dim target As Double
+        Dim rnd As New Random(23)
+
+
+        For i As Integer = 1 To 400000
+            Dim n As Integer = rnd.Next(4)
+
+            Select Case n
+                Case 0
+                    x = 0
+                    y = 0
+                    target = 1
+
+                Case 1
+                    x = 1
+                    y = 0
+                    target = 1
+
+                Case 2
+                    x = 1
+                    y = 0
+                    target = 1
+
+                Case 3
+                    x = 1
+                    y = 1
+                    target = 1
+
+            End Select
+
+            w1.Clear()
+            w2.Clear()
+            addw1w2.Clear()
+            bias1.Clear()
+
+            w3.Clear()
+            w4.Clear()
+            addw3w4.Clear()
+            bias2.Clear()
+
+            w5.Clear()
+            w6.Clear()
+            addw5w6.Clear()
+            bias3.Clear()
+
+            biasOut.Clear()
+            wOut.Clear()
+            addb1b2.Clear()
+            addb1b2b3.Clear()
+
+
+            b1Result = bias1.Forward(addw1w2.Forward(w1.Forward(x), w2.Forward(y)))
+            b2Result = bias2.Forward(addw3w4.Forward(w3.Forward(x), w4.Forward(y)))
+            b3Result = bias3.Forward(addw5w6.Forward(w5.Forward(x), w6.Forward(y)))
+            result = biasOut.Forward(wOut.Forward(addb1b2b3.Forward(addb1b2.Forward(b1Result, b2Result), b3Result)))
+
+            err = target - result
+
+            biasOut.Backward(err)
+            wOut.Backward(biasOut.GradientInput)
+            addb1b2b3.Backward(wOut.GradientInput)
+            addb1b2.Backward(addb1b2b3.GradientX)
+
+            bias3.Backward(addb1b2b3.GradientY)
+            addw5w6.Backward(bias3.GradientInput)
+            w5.Backward(addw5w6.GradientX)
+            w6.Backward(addw5w6.GradientY)
+
+            bias1.Backward(addb1b2.GradientX)
+            addw1w2.Backward(bias1.GradientInput)
+            w1.Backward(addw1w2.GradientX)
+            w2.Backward(addw1w2.GradientY)
+
+            bias2.Backward(addb1b2.GradientY)
+            addw3w4.Backward(bias2.GradientInput)
+            w3.Backward(addw3w4.GradientX)
+            w4.Backward(addw3w4.GradientY)
+
+
+            biasOut.Update(learningRate)
+            wOut.Update(learningRate)
+            addb1b2b3.Update(learningRate)
+            addb1b2.Update(learningRate)
+
+
+            bias1.Update(learningRate)
+            addw1w2.Update(learningRate)
+            w1.Update(learningRate)
+            w2.Update(learningRate)
+
+            bias2.Update(learningRate)
+            addw3w4.Update(learningRate)
+            w3.Update(learningRate)
+            w4.Update(learningRate)
+
+            bias3.Update(learningRate)
+            addw5w6.Update(learningRate)
+            w5.Update(learningRate)
+            w6.Update(learningRate)
+            '      End If
+
+            If i Mod 50 = 0 Then
+                x = one(0)
+                y = one(1)
+                target = 0
+
+
+                b1Result = bias1.Forward(addw1w2.Forward(w1.Forward(x), w2.Forward(y)))
+                b2Result = bias2.Forward(addw3w4.Forward(w3.Forward(x), w4.Forward(y)))
+                b3Result = bias3.Forward(addw5w6.Forward(w5.Forward(x), w6.Forward(y)))
+                result = biasOut.Forward(wOut.Forward(addb1b2b3.Forward(addb1b2.Forward(b1Result, b2Result), b3Result)))
+                Console.WriteLine("{0}, {1}", target, result)
+
+                x = two(0)
+                y = two(1)
+                target = 1
+
+                b1Result = bias1.Forward(addw1w2.Forward(w1.Forward(x), w2.Forward(y)))
+                b2Result = bias2.Forward(addw3w4.Forward(w3.Forward(x), w4.Forward(y)))
+                b3Result = bias3.Forward(addw5w6.Forward(w5.Forward(x), w6.Forward(y)))
+                result = biasOut.Forward(wOut.Forward(addb1b2b3.Forward(addb1b2.Forward(b1Result, b2Result), b3Result)))
+                Console.WriteLine("{0}, {1}", target, result)
+
+                x = three(0)
+                y = three(1)
+                target = 1
+
+                b1Result = bias1.Forward(addw1w2.Forward(w1.Forward(x), w2.Forward(y)))
+                b2Result = bias2.Forward(addw3w4.Forward(w3.Forward(x), w4.Forward(y)))
+                b3Result = bias3.Forward(addw5w6.Forward(w5.Forward(x), w6.Forward(y)))
+                result = biasOut.Forward(wOut.Forward(addb1b2b3.Forward(addb1b2.Forward(b1Result, b2Result), b3Result)))
+                Console.WriteLine("{0}, {1}", target, result)
+
+                x = four(0)
+                y = four(1)
+                target = 0
+
+                b1Result = bias1.Forward(addw1w2.Forward(w1.Forward(x), w2.Forward(y)))
+                b2Result = bias2.Forward(addw3w4.Forward(w3.Forward(x), w4.Forward(y)))
+                b3Result = bias3.Forward(addw5w6.Forward(w5.Forward(x), w6.Forward(y)))
+                result = biasOut.Forward(wOut.Forward(addb1b2b3.Forward(addb1b2.Forward(b1Result, b2Result), b3Result)))
+                Console.WriteLine("{0}, {1}", target, result)
+                Console.WriteLine()
+            End If
+
+        Next
+    End Sub
+
+    Public Sub TestGates()
+        Dim x As New Pow2WeightGate
+        Dim y As New Pow2WeightGate
+        Dim z As New AddGate
+        Dim result, resultAfterUpdate As Double
+
+        'relu bestimmt was gut war, diese dann verstärken als lernmethode
+        'ich sage input war gut, dann wir dieser trampelpfad verstärkt
+        'schlecht => pfad wird verringert
+        'ist das nicht backprop mit relu? ja nur, dass ich nix berechnen muss, nur auf die relus erhöhen, wo es gut war um factor x
+        TestXor()
+        TestBias()
+        TestRelu()
+        TestSigmoid()
+        TestTanh()
+        x.Weight = 1
+        y.Weight = -0.5
+
+        For i As Integer = 1 To 40
+            x.Clear()
+            y.Clear()
+            z.Clear()
+
+
+            result = z.Forward(x.Forward(1), y.Forward(0.3))
+
+            z.Backward(-1)
+            x.Backward(z.GradientX)
+            y.Backward(z.GradientY)
+
+            z.Update(0.01)
+            x.Update(0.01)
+            y.Update(0.01)
+            Console.WriteLine(result)
+        Next
+    End Sub
+
     Sub Main()
         Dim invest As New InvestMonthlyStrategy
         Dim momentum As New MomentumStrategy
@@ -211,7 +763,11 @@ Module Program
         Dim loader As New Downloader
         Dim sd As String
         Dim s As Stock
-
+        ' ThreeToOne()
+        NetworkTest()
+        TestGates()
+        NetworkTestXor()
+        NetworkTestSnp()
         ThreeToOneLayer()
         CreateAllDirectories()
         Snp()
