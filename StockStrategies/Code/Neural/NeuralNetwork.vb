@@ -60,6 +60,9 @@
             Case ILayer.LayerTypeE.Relu
                 Return Me.AddReluLayer()
 
+            Case ILayer.LayerTypeE.Tanh
+                Return Me.AddTanhLayer()
+
             Case Else
                 Throw New InvalidOperationException("Invalid layer type.")
 

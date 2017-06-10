@@ -32,7 +32,7 @@
         For Each neuron In Me.Neurons
             For i As Integer = 0 To neuron.Weights.Length - 1
                 neuron.Weights(i) = rnd.NextDouble * 2.0 - 1.0
-                Console.WriteLine(neuron.Weights(i))
+                ' Console.WriteLine(neuron.Weights(i))
             Next
         Next
     End Sub

@@ -5,7 +5,7 @@ Public Interface ILayer
     Enum LayerTypeE
         FullyConnected
         Relu
-
+        Tanh
     End Enum
 
     Sub Randomize(rnd As Random)

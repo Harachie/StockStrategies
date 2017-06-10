@@ -233,28 +233,24 @@ Module Program
         Dim hits As Integer
         Dim result As Double
 
-        'datas.Add({1.2, 0.7}) : labels.Add(1)
-        'datas.Add({-0.3, -0.5}) : labels.Add(-1)
-        'datas.Add({3.0, 0.1}) : labels.Add(1)
-        'datas.Add({-0.1, -1.0}) : labels.Add(-1)
-        'datas.Add({-1.0, 1.1}) : labels.Add(-1)
-        'datas.Add({2.1, -3.0}) : labels.Add(1)
+        datas.Add({1.2, 0.7}) : labels.Add(1)
+        datas.Add({-0.3, -0.5}) : labels.Add(-1)
+        datas.Add({3.0, 0.1}) : labels.Add(1)
+        datas.Add({-0.1, -1.0}) : labels.Add(-1)
+        datas.Add({-1.0, 1.1}) : labels.Add(-1)
+        datas.Add({2.1, -3.0}) : labels.Add(1)
 
 
-        datas.Add({0, 0}) : labels.Add(-1)
-        datas.Add({0, 1}) : labels.Add(1)
-        datas.Add({1, 0}) : labels.Add(1)
-        datas.Add({1, 1}) : labels.Add(-1)
+        'datas.Add({0, 0}) : labels.Add(-1)
+        'datas.Add({0, 1}) : labels.Add(1)
+        'datas.Add({1, 0}) : labels.Add(1)
+        'datas.Add({1, 1}) : labels.Add(-1)
 
 
-        nn.AddInputLayer(7)
-        '  nn.AddTanhLayer()
-        nn.AddReluLayer()
-        nn.AddNeuronLayer(3)
-        '   nn.AddReluLayer()
-        '    nn.AddNeuronLayer(2)
-        nn.AddReluLayer()
-        Dim lastLayer As NeuronLayer = CType(nn.AddFinalLayer(1, ILayer.LayerTypeE.FullyConnected), NeuronLayer)
+        nn.AddInputLayer(5)
+        nn.AddTanhLayer()
+        nn.AddNeuronLayer(1)
+        nn.AddFinalLayer(1, ILayer.LayerTypeE.Tanh)
         nn.Randomize(rnd)
         Console.WriteLine()
 
@@ -269,29 +265,29 @@ Module Program
             result = nnResult(0)
             err = labels(index) - result
 
-            If labels(index) = 1 AndAlso result < 1 Then
-                nn.Backward({1.0})
+            'If labels(index) = 1 AndAlso result < 1 Then
+            '    nn.Backward({1.0})
 
-            ElseIf labels(index) = -1 AndAlso result > -1 Then
-                nn.Backward({-1.0})
+            'ElseIf labels(index) = -1 AndAlso result > -1 Then
+            '    nn.Backward({-1.0})
 
-            Else
-                nn.Backward({0.0})
-            End If
+            'Else
+            '    nn.Backward({0.0})
+            'End If
 
-            '   nn.Backward({err})
+            nn.Backward({err})
             'nn.Regularize()
             nn.UpdateWeightsAdam(0.01)
 
             hits = 0
 
-            If i Mod 50 = 0 Then
-                Console.WriteLine(hits)
-            End If
+            'If i Mod 50 = 0 Then
+            '    Console.WriteLine(hits)
+            'End If
 
-            If lastLayer.Neurons(0).Weights(0) > 5 OrElse lastLayer.Neurons(0).Weights(0) < -5 Then
-                Dim stopHere = 1
-            End If
+            'If lastLayer.Neurons(0).Weights(0) > 5 OrElse lastLayer.Neurons(0).Weights(0) < -5 Then
+            '    Dim stopHere = 1
+            'End If
 
             For n As Integer = 0 To datas.Count - 1
                 current = datas(n)
@@ -306,10 +302,14 @@ Module Program
                 End If
             Next
 
-            If hits = 6 Then
+            If hits = datas.Count Then
                 Dim stopHere = 1
             End If
 
+            If i Mod 5000 = 0 Then
+
+                nn.Randomize(rnd)
+            End If
 
         Next
     End Sub
@@ -397,7 +397,7 @@ Module Program
         Dim result As Double
 
         Dim sdc As StockDataCollection = StockDataCollection.ReadFromStooqFile(IO.Path.Combine(GetStooqDirectory(), "snp.txt"))
-        Dim filtered = sdc.FilterByMinimumStartDate(DateSerial(2015, 1, 1))
+        Dim filtered = sdc.FilterByMinimumStartDate(DateSerial(2007, 1, 1))
         Dim afterSell As Double
         Dim compareBar, buyBar As StockData
         Dim data As New List(Of Double)
@@ -417,20 +417,26 @@ Module Program
 
             datas.Add(data.ToArray)
 
-            If afterSell > 0.1 Then
+            If afterSell > 0.0 Then
                 labels.Add(1)
                 positiveL += 1
             Else
                 labels.Add(-1)
                 negativeL += 1
             End If
+
+            If positiveL > 50 AndAlso positiveL = negativeL Then
+                Exit For
+            End If
         Next
 
-        nn.AddInputLayer(3)
-        nn.AddReluLayer()
-        nn.AddFinalLayer(1, ILayer.LayerTypeE.FullyConnected)
+        nn.AddInputLayer(5)
+        nn.AddTanhLayer()
+        nn.AddNeuronLayer(1)
+        nn.AddFinalLayer(1, ILayer.LayerTypeE.Tanh)
         nn.Randomize(rnd)
         Console.WriteLine()
+        Dim err As Double
 
         For i As Integer = 1 To 4000000
             index = rnd.Next(datas.Count)
@@ -440,21 +446,21 @@ Module Program
             nnResult = nn.Forward(current)
             result = nnResult(0)
 
-            If labels(index) = 1 AndAlso result < 1 Then
-                nn.Backward({1.0})
+            err = labels(index) - result
 
-            ElseIf labels(index) = -1 AndAlso result > -1 Then
-                nn.Backward({-1.0})
+            'If labels(index) = 1 AndAlso result < 1 Then
+            '    nn.Backward({1.0})
 
-            Else
-                nn.Backward({0.0})
-            End If
+            'ElseIf labels(index) = -1 AndAlso result > -1 Then
+            '    nn.Backward({-1.0})
 
-            If i Mod 20 = 0 Then
+            'Else
+            '    nn.Backward({0.0})
+            'End If
 
-            End If
+            nn.Regularize()
 
-            '  nn.Regularize()
+            nn.Backward({err})
             nn.UpdateWeightsAdam(0.01)
 
             hits = 0
@@ -764,10 +770,10 @@ Module Program
         Dim sd As String
         Dim s As Stock
         ' ThreeToOne()
+        NetworkTestSnp()
         NetworkTest()
         TestGates()
         NetworkTestXor()
-        NetworkTestSnp()
         ThreeToOneLayer()
         CreateAllDirectories()
         Snp()
