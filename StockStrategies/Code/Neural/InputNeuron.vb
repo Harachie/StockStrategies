@@ -17,7 +17,7 @@
         ReDim Me.LocalWeightGradients(inputs)
         ReDim Me.WeightGradients(inputs)
 
-        Me.Weights(inputs) = 0.01
+        Me.Weights(inputs) = 0.0
     End Sub
 
     Public Sub Clear() Implements INeuron.Clear

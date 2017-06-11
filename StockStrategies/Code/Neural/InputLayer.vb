@@ -30,7 +30,7 @@ Public Class InputLayer
 
     Public Sub Randomize(rnd As Random) Implements ILayer.Randomize
         For Each neuron In Me.Neurons
-            For i As Integer = 0 To neuron.Weights.Length - 1
+            For i As Integer = 0 To neuron.Weights.Length - 2 'bias startet bei 0
                 neuron.Weights(i) = rnd.NextDouble * 2.0 - 1.0
                 '   Console.WriteLine(neuron.Weights(i))
             Next

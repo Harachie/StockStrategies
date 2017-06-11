@@ -1,8 +1,5 @@
 ﻿Public Class AddGate
 
-    Public LocalGradientX As Double = 1.0
-    Public LocalGradientY As Double = 1.0
-
     Public GradientX As Double
     Public GradientY As Double
 
@@ -15,20 +12,20 @@
     End Sub
 
     Public Function Forward(x As Double, y As Double) As Double
-        'Me.X += x
-        'Me.Y += y
+        Me.X += x
+        Me.Y += y
 
         Return x + y
     End Function
 
-    Public Sub Backward(direction As Double)
-        Me.GradientX += direction * Me.LocalGradientX
-        Me.GradientY += direction * Me.LocalGradientY
+    Public Sub Backward(topGradient As Double)
+        Me.GradientX += topGradient
+        Me.GradientY += topGradient
     End Sub
 
     Public Sub Update(learningRate As Double)
-        'Me.X += Me.GradientX * learningRate
-        'Me.Y += Me.GradientY * learningRate
+        Me.X += Me.GradientX * learningRate
+        Me.Y += Me.GradientY * learningRate
     End Sub
 
 End Class
@@ -36,21 +33,21 @@ End Class
 Public Class AddBiasGate
 
     Public GradientBias As Double
-    Public GradientInput As Double
+    Public GradientX As Double
     Public Bias As Double
 
     Public Sub Clear()
         Me.GradientBias = 0.0
-        Me.GradientInput = 0.0
+        Me.GradientX = 0.0
     End Sub
 
     Public Function Forward(x As Double) As Double
         Return Me.Bias + x
     End Function
 
-    Public Sub Backward(direction As Double)
-        Me.GradientBias += direction
-        Me.GradientInput += direction
+    Public Sub Backward(topGradient As Double)
+        Me.GradientBias += topGradient
+        Me.GradientX += topGradient
     End Sub
 
     Public Sub Update(learningRate As Double)
@@ -87,9 +84,9 @@ Public Class MultiplyGate
         Return x * y
     End Function
 
-    Public Sub Backward(direction As Double)
-        Me.GradientX += direction * Me.LocalGradientX
-        Me.GradientY += direction * Me.LocalGradientY
+    Public Sub Backward(topGradient As Double)
+        Me.GradientX += topGradient * Me.LocalGradientX
+        Me.GradientY += topGradient * Me.LocalGradientY
     End Sub
 
     Public Sub Update(learningRate As Double)
@@ -100,6 +97,42 @@ Public Class MultiplyGate
 End Class
 
 Public Class MultiplyWeightGate
+
+    Public LocalGradientWeight As Double
+    Public LocalGradientX As Double
+    Public GradientWeight As Double
+    Public GradientX As Double
+
+    Public Input As Double
+    Public Weight As Double
+
+    Public Sub Clear()
+        Me.LocalGradientWeight = 0.0
+        Me.LocalGradientX = 0.0
+        Me.GradientWeight = 0.0
+        Me.GradientX = 0.0
+    End Sub
+
+    Public Function Forward(x As Double) As Double
+        Me.Input = x
+        Me.LocalGradientWeight = x
+        Me.LocalGradientX = Me.Weight
+
+        Return x * Me.Weight
+    End Function
+
+    Public Sub Backward(topGradient As Double)
+        Me.GradientX += topGradient * Me.LocalGradientX
+        Me.GradientWeight += topGradient * Me.LocalGradientWeight
+    End Sub
+
+    Public Sub Update(learningRate As Double)
+        Me.Weight += Me.GradientWeight * learningRate
+    End Sub
+
+End Class
+
+Public Class Pow2WeightGate
 
     Public LocalGradientWeight As Double
     Public LocalGradientInput As Double
@@ -118,45 +151,15 @@ Public Class MultiplyWeightGate
 
     Public Function Forward(x As Double) As Double
         Me.Input = x
-        Me.LocalGradientWeight = x
         Me.LocalGradientInput = Me.Weight
-
-        Return x * Me.Weight
-    End Function
-
-    Public Sub Backward(direction As Double)
-        Me.GradientWeight += direction * Me.LocalGradientWeight
-        Me.GradientInput += direction * Me.LocalGradientInput
-    End Sub
-
-    Public Sub Update(learningRate As Double)
-        Me.Weight += Me.GradientWeight * learningRate
-    End Sub
-
-End Class
-
-Public Class Pow2WeightGate
-
-    Public LocalGradientWeight As Double
-    Public GradientWeight As Double
-
-    Public Input As Double
-    Public Weight As Double
-
-    Public Sub Clear()
-        Me.GradientWeight = 0.0
-        Me.LocalGradientWeight = 0.0
-    End Sub
-
-    Public Function Forward(x As Double) As Double
-        Me.Input = x
         Me.LocalGradientWeight += 2 * Me.Weight * x
 
         Return x * x * Me.Weight
     End Function
 
-    Public Sub Backward(direction As Double)
-        Me.GradientWeight += direction * Me.LocalGradientWeight
+    Public Sub Backward(topGradient As Double)
+        Me.GradientInput += topGradient * Me.LocalGradientInput
+        Me.GradientWeight += topGradient * Me.LocalGradientWeight
     End Sub
 
     Public Sub Update(learningRate As Double)
@@ -168,11 +171,11 @@ End Class
 Public Class TanhGate 'inputs über +-1 haben nen extrem kleinen gradient und lernen langsam
 
     Public LocalGradient As Double
-    Public Gradient As Double
+    Public GradientX As Double
     Public Input As Double
 
     Public Sub Clear()
-        Me.Gradient = 0.0
+        Me.GradientX = 0.0
         Me.LocalGradient = 0.0
     End Sub
 
@@ -187,12 +190,12 @@ Public Class TanhGate 'inputs über +-1 haben nen extrem kleinen gradient und le
         Return t
     End Function
 
-    Public Sub Backward(direction As Double)
-        Me.Gradient += direction * Me.LocalGradient
+    Public Sub Backward(topGradient As Double)
+        Me.GradientX += topGradient * Me.LocalGradient
     End Sub
 
     Public Sub Update(learningRate As Double)
-        Me.Input += Me.Gradient * learningRate
+        Me.Input += Me.GradientX * learningRate
     End Sub
 
 End Class
@@ -223,8 +226,8 @@ Public Class SigmoidGate 'inputs über +-1 haben nen extrem kleinen gradient und
         Return s
     End Function
 
-    Public Sub Backward(direction As Double)
-        Me.Gradient += direction * Me.LocalGradient
+    Public Sub Backward(topGradient As Double)
+        Me.Gradient += topGradient * Me.LocalGradient
     End Sub
 
     Public Sub Update(learningRate As Double)
@@ -248,7 +251,6 @@ Public Class ReluGate
         Dim t As Double
 
         t = Math.Max(0.0, x)
-
         Me.Input = x
 
         If t > 0 Then
@@ -260,12 +262,59 @@ Public Class ReluGate
         Return t
     End Function
 
-    Public Sub Backward(direction As Double)
-        Me.Gradient += direction * Me.LocalGradient
+    Public Sub Backward(topGradient As Double)
+        Me.Gradient += topGradient * Me.LocalGradient
     End Sub
 
     Public Sub Update(learningRate As Double)
         Me.Input += Me.Gradient * learningRate
+    End Sub
+
+End Class
+
+Public Class TwoInputTanhNeuronGate
+
+    Public GradientX As Double
+    Public GradientY As Double
+
+    Public Ax As New MultiplyWeightGate
+    Public By As New MultiplyWeightGate
+    Public AxBy As New AddGate
+    Public AxByC As New AddBiasGate
+    Public Activation As New TanhGate
+
+    Public Sub Clear()
+        Me.GradientX = 0.0
+        Me.GradientY = 0.0
+
+        Me.Ax.Clear()
+        Me.By.Clear()
+        Me.AxBy.Clear()
+        Me.AxByC.Clear()
+        Me.Activation.Clear()
+    End Sub
+
+    Public Function Forward(x As Double, y As Double) As Double
+        Return Me.Activation.Forward(Me.AxByC.Forward(Me.AxBy.Forward(Me.Ax.Forward(x), Me.By.Forward(y))))
+    End Function
+
+    Public Sub Backward(topGradient As Double)
+        Me.Activation.Backward(topGradient)
+        Me.AxByC.Backward(Me.Activation.GradientX)
+        Me.AxBy.Backward(Me.AxByC.GradientX)
+        Me.Ax.Backward(Me.AxBy.GradientX)
+        Me.By.Backward(Me.AxBy.GradientY)
+
+        Me.GradientX = Me.Ax.GradientX
+        Me.GradientY = Me.By.GradientX
+    End Sub
+
+    Public Sub Update(learningRate As Double)
+        ' Me.Activation.Update(learningRate) 'does nothing, has no parameter
+        Me.AxByC.Update(learningRate) 'updates c (bias)
+        '  Me.AxBy.Update(learningRate) 'does nothing, has no parameter
+        Me.Ax.Update(learningRate) 'updates a
+        Me.By.Update(learningRate) 'updates b
     End Sub
 
 End Class

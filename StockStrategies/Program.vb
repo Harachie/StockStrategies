@@ -1,4 +1,5 @@
 ﻿Imports System.Text.RegularExpressions
+Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
@@ -314,173 +315,170 @@ Module Program
         Next
     End Sub
 
-    Public Sub NetworkTestXor()
-        Dim nn As New NeuralNetwork(2)
-        Dim rnd As New Random(24)
-        Dim datas As New List(Of Double())
-        Dim labels As New List(Of Integer)
-        Dim index As Integer
-        Dim current, nnResult As Double()
-        Dim hits As Integer
-        Dim result As Double
-
-        datas.Add({0, 0}) : labels.Add(-1)
-        datas.Add({0, 1}) : labels.Add(1)
-        datas.Add({1, 0}) : labels.Add(1)
-        datas.Add({1, 1}) : labels.Add(-1)
-
-
-        nn.AddInputLayer(5)
-        '   nn.AddNeuronLayer(2)
-        '    nn.AddReluLayer()
-        nn.AddFinalLayer(1, ILayer.LayerTypeE.FullyConnected)
-        nn.Randomize(rnd)
-        Console.WriteLine()
-
-        For i As Integer = 1 To 4000000
-            index = rnd.Next(datas.Count)
-            current = datas(index)
-
-            nn.Clear()
-            nnResult = nn.Forward(current)
-            result = nnResult(0)
-
-            If labels(index) = 1 AndAlso result < 1 Then
-                nn.Backward({1.0})
-
-            ElseIf labels(index) = -1 AndAlso result > -1 Then
-                nn.Backward({-1.0})
-
-            Else
-                nn.Backward({0.0})
-            End If
-
-            '  nn.Regularize()
-            nn.UpdateWeights(1)
-            Dim nnResult2 = nn.Forward(current)
-            Dim result2 = nnResult2(0)
-
-            hits = 0
-
-            For n As Integer = 0 To datas.Count - 1
-                current = datas(n)
-                nnResult = nn.Forward(current)
-                result = nnResult(0)
-
-                If labels(n) = 1 AndAlso result > 0 Then
-                    hits += 1
-
-                ElseIf labels(n) = -1 AndAlso result <= 0 Then
-                    hits += 1
-                End If
-            Next
-
-            If hits = 4 Then
-                Dim stopHere = 1
-            End If
-
-
-            If i Mod 50 = 0 Then
-                Console.WriteLine(hits)
-            End If
-        Next
-    End Sub
 
     Public Sub NetworkTestSnp()
-        Dim nn As New NeuralNetwork(4)
         Dim rnd As New Random(24)
         Dim datas As New List(Of Double())
-        Dim labels As New List(Of Integer)
+        Dim labels As New List(Of Double)
+        Dim datasC As New List(Of Double())
+        Dim labelsC As New List(Of Double)
+        Dim results As New List(Of Double)
+        Dim resultsC As New List(Of Double)
         Dim index As Integer
         Dim current, nnResult As Double()
-        Dim hits As Integer
+        Dim hits, hitsC As Integer
         Dim result As Double
 
         Dim sdc As StockDataCollection = StockDataCollection.ReadFromStooqFile(IO.Path.Combine(GetStooqDirectory(), "snp.txt"))
-        Dim filtered = sdc.FilterByMinimumStartDate(DateSerial(2007, 1, 1))
+        Dim filtered = sdc.FilterByMinimumStartDate(DateSerial(1990, 1, 1))
         Dim afterSell As Double
         Dim compareBar, buyBar As StockData
         Dim data As New List(Of Double)
         Dim positiveL, negativeL As Integer
+        Dim selectionIndices As New List(Of Integer)
+        Dim sellAfter As Integer = 260
 
+        selectionIndices.Add(260)
+        selectionIndices.Add(195)
+        selectionIndices.Add(130)
+        selectionIndices.Add(65)
+        'selectionIndices.Add(20)
+        'selectionIndices.Add(15)
+        'selectionIndices.Add(10)
+        'selectionIndices.Add(5)
+        'selectionIndices.Add(4)
+        'selectionIndices.Add(3)
+        'selectionIndices.Add(2)
+        'selectionIndices.Add(1)
 
-        For i As Integer = 260 To filtered.Count - 132
+        Dim nn As New NeuralNetwork(selectionIndices.Count)
+        Dim maxIndex As Integer = selectionIndices.Max
+        Dim labelTarget As Double = 0.8
+        Dim initialLearningRate As Double = 0.0001
+        Dim learningRate As Double = initialLearningRate
+        Dim addToCompare As Boolean
+
+        For i As Integer = maxIndex To filtered.Count - (sellAfter + 2)
             data.Clear()
             compareBar = filtered(i)
             buyBar = filtered(i + 1)
-            afterSell = filtered(i + 131).Close / buyBar.Close - 1.0
+            afterSell = filtered(i + sellAfter + 1).Close / buyBar.Close - 1.0
 
-            data.Add(compareBar.Close / filtered(i - 260).Close - 1.0)
-            data.Add(compareBar.Close / filtered(i - 195).Close - 1.0)
-            data.Add(compareBar.Close / filtered(i - 130).Close - 1.0)
-            data.Add(compareBar.Close / filtered(i - 65).Close - 1.0)
+            For Each selectionIndex In selectionIndices
+                data.Add(compareBar.Close / filtered(i - selectionIndex).Close - 1.0)
+            Next
 
-            datas.Add(data.ToArray)
+            If addToCompare Then
+                datasC.Add(data.ToArray)
+                resultsC.Add(afterSell)
+            Else
+                datas.Add(data.ToArray)
+                results.Add(afterSell)
+            End If
 
             If afterSell > 0.0 Then
-                labels.Add(1)
+                If addToCompare Then
+                    labelsC.Add(labelTarget)
+                Else
+                    labels.Add(labelTarget)
+                End If
+
                 positiveL += 1
-            Else
-                labels.Add(-1)
+            ElseIf afterSell < 0 Then
+                If addToCompare Then
+                    labelsC.Add(-labelTarget)
+                Else
+                    labels.Add(-labelTarget)
+                End If
+
                 negativeL += 1
             End If
 
-            If positiveL > 50 AndAlso positiveL = negativeL Then
-                Exit For
+            If (positiveL > 700 AndAlso positiveL = negativeL) OrElse i = 5000 Then
+                addToCompare = True
             End If
         Next
 
+        Dim postiveHits As Double = labels.Where(Function(x) x > 0).Count / labels.Count
+        Dim postiveHitsC As Double = labelsC.Where(Function(x) x > 0).Count / labelsC.Count
+
         nn.AddInputLayer(5)
-        nn.AddTanhLayer()
+        'nn.AddReluLayer()
+        'nn.AddNeuronLayer(7)
+        nn.AddReluLayer()
         nn.AddNeuronLayer(1)
         nn.AddFinalLayer(1, ILayer.LayerTypeE.Tanh)
         nn.Randomize(rnd)
         Console.WriteLine()
-        Dim err As Double
+        Dim err, errC As Double
 
-        For i As Integer = 1 To 4000000
+        For i As Integer = 1 To 400000000
             index = rnd.Next(datas.Count)
             current = datas(index)
 
             nn.Clear()
             nnResult = nn.Forward(current)
             result = nnResult(0)
-
             err = labels(index) - result
 
-            'If labels(index) = 1 AndAlso result < 1 Then
-            '    nn.Backward({1.0})
-
-            'ElseIf labels(index) = -1 AndAlso result > -1 Then
-            '    nn.Backward({-1.0})
-
-            'Else
-            '    nn.Backward({0.0})
-            'End If
-
-            nn.Regularize()
-
             nn.Backward({err})
-            nn.UpdateWeightsAdam(0.01)
+            nn.UpdateWeightsAdam(learningRate)
 
             hits = 0
 
-            For n As Integer = 0 To datas.Count - 1
-                current = datas(n)
-                nnResult = nn.Forward(current)
-                result = nnResult(0)
+            If i Mod 1000 = 0 Then
+                err = 0
+                errc = 0
+                hits = 0
+                hitsC = 0
 
-                If labels(n) = 1 AndAlso result > 0 Then
-                    hits += 1
+                For n As Integer = 0 To datas.Count - 1
+                    current = datas(n)
+                    nnResult = nn.Forward(current)
+                    result = nnResult(0)
 
-                ElseIf labels(n) = -1 AndAlso result <= 0 Then
-                    hits += 1
+                    If result > 0.0 AndAlso labels(n) > 0.0 Then
+                        hits += 1
+                    End If
+
+                    If result < 0.0 AndAlso labels(n) < 0 Then
+                        hits += 1
+                    End If
+
+                    err += 0.5 * (labels(n) - result) * (labels(n) - result)
+                Next
+
+                For n As Integer = 0 To datasC.Count - 1
+                    current = datasC(n)
+                    nnResult = nn.Forward(current)
+                    result = nnResult(0)
+
+                    If result > 0.0 AndAlso labelsC(n) > 0.0 Then
+                        hitsC += 1
+                    End If
+
+                    If result < 0.0 AndAlso labelsC(n) < 0 Then
+                        hitsC += 1
+                    End If
+
+                    errC += 0.5 * (labelsC(n) - result) * (labelsC(n) - result)
+                Next
+
+                If err < 500 AndAlso learningRate = initialLearningRate Then
+                    learningRate /= 2.0
                 End If
-            Next
 
+                If err < 450 AndAlso learningRate = initialLearningRate / 2.0 Then
+                    learningRate /= 2.0
+                End If
 
-            If i Mod 50 = 0 Then
-                Console.WriteLine("{0:n0} {1:n3}", hits, hits / datas.Count)
+                If err < 400 AndAlso learningRate = initialLearningRate / 4.0 Then
+                    learningRate /= 2.0
+                End If
+
+                ' Console.WriteLine("{0:n0} | {1:n0}", postiveHits, postiveHitsC)
+                Console.WriteLine("hits {0:n0} / {1:n2}, err {2:n3}, hits {3:n0} / {4:n2}, err {5:n3}, lr {6:n5} | {7:n3}, {8:n3}", hits, hits / datas.Count, err, hitsC, hitsC / datasC.Count, errC, learningRate, postiveHits, postiveHitsC)
+                ' Threading.Thread.Sleep(10)
             End If
         Next
     End Sub
@@ -635,22 +633,22 @@ Module Program
             err = target - result
 
             biasOut.Backward(err)
-            wOut.Backward(biasOut.GradientInput)
-            addb1b2b3.Backward(wOut.GradientInput)
+            wOut.Backward(biasOut.GradientX)
+            addb1b2b3.Backward(wOut.GradientX)
             addb1b2.Backward(addb1b2b3.GradientX)
 
             bias3.Backward(addb1b2b3.GradientY)
-            addw5w6.Backward(bias3.GradientInput)
+            addw5w6.Backward(bias3.GradientX)
             w5.Backward(addw5w6.GradientX)
             w6.Backward(addw5w6.GradientY)
 
             bias1.Backward(addb1b2.GradientX)
-            addw1w2.Backward(bias1.GradientInput)
+            addw1w2.Backward(bias1.GradientX)
             w1.Backward(addw1w2.GradientX)
             w2.Backward(addw1w2.GradientY)
 
             bias2.Backward(addb1b2.GradientY)
-            addw3w4.Backward(bias2.GradientInput)
+            addw3w4.Backward(bias2.GradientX)
             w3.Backward(addw3w4.GradientX)
             w4.Backward(addw3w4.GradientY)
 
@@ -761,6 +759,267 @@ Module Program
         Next
     End Sub
 
+    Public Sub SimpleXor()
+        Dim datas As New List(Of Double())
+        Dim labels As New List(Of Double)
+        Dim inputNeuron1, inputNeuron2 As TwoInputTanhNeuronGate
+        Dim outputNeuron As TwoInputTanhNeuronGate
+        Dim rnd As New Random(23)
+        Dim index As Integer
+        Dim input As Double()
+        Dim result, in1, in2, err, lr As Double
+
+        lr = 0.07
+
+        inputNeuron1 = New TwoInputTanhNeuronGate
+        inputNeuron2 = New TwoInputTanhNeuronGate
+        outputNeuron = New TwoInputTanhNeuronGate
+
+        inputNeuron1.Ax.Weight = -1.0
+        inputNeuron1.By.Weight = -0.6
+
+        inputNeuron2.Ax.Weight = -0.5
+        inputNeuron2.By.Weight = 0.7
+
+        outputNeuron.Ax.Weight = 0.3
+        outputNeuron.By.Weight = 0.5
+
+        datas.Add({0, 0}) : labels.Add(-0.7)
+        datas.Add({1, 1}) : labels.Add(-0.7)
+        datas.Add({1, 0}) : labels.Add(0.7)
+        datas.Add({0, 1}) : labels.Add(0.7)
+
+        For epoch As Integer = 1 To 5000000
+            index = rnd.Next(datas.Count)
+            input = datas(index)
+
+            inputNeuron1.Clear()
+            inputNeuron2.Clear()
+            outputNeuron.Clear()
+
+            in1 = inputNeuron1.Forward(input(0), input(1))
+            in2 = inputNeuron2.Forward(input(0), input(1))
+            result = outputNeuron.Forward(in1, in2)
+            err = labels(index) - result
+
+            outputNeuron.Backward(err)
+            inputNeuron1.Backward(outputNeuron.GradientX)
+            inputNeuron2.Backward(outputNeuron.GradientY)
+
+            outputNeuron.Update(lr)
+            inputNeuron1.Update(lr)
+            inputNeuron2.Update(lr)
+
+            If epoch Mod 100 = 0 Then
+                Dim stopHere = 1
+                err = 0.0
+
+                For Each input In datas
+                    index = datas.IndexOf(input)
+                    in1 = inputNeuron1.Forward(input(0), input(1))
+                    in2 = inputNeuron2.Forward(input(0), input(1))
+                    result = outputNeuron.Forward(in1, in2)
+                    err += 0.5 * (labels(index) - result) * (labels(index) - result)
+                Next
+
+                Console.WriteLine(err)
+                Threading.Thread.Sleep(50)
+            End If
+        Next
+    End Sub
+
+    Public Sub SimpleXorCompareNet()
+        Dim nn As New NeuralNetwork(2)
+        Dim datas As New List(Of Double())
+        Dim labels As New List(Of Double)
+        Dim inputNeuron1, inputNeuron2 As TwoInputTanhNeuronGate
+        Dim outputNeuron As TwoInputTanhNeuronGate
+        Dim rnd As New Random(23)
+        Dim index As Integer
+        Dim input As Double()
+        Dim result, resultNN, in1, in2, err, lr As Double
+
+        lr = 0.075
+
+        Dim il As InputLayer = nn.AddInputLayer(2)
+        Dim th = nn.AddTanhLayer()
+        Dim nl As NeuronLayer = CType(nn.AddNeuronLayer(1), NeuronLayer)
+        Dim tf As TanhLayer = CType(nn.AddFinalLayer(1, ILayer.LayerTypeE.Tanh), TanhLayer)
+
+        inputNeuron1 = New TwoInputTanhNeuronGate
+        inputNeuron2 = New TwoInputTanhNeuronGate
+        outputNeuron = New TwoInputTanhNeuronGate
+
+        inputNeuron1.Ax.Weight = -1.0
+        inputNeuron1.By.Weight = -0.6
+        il.Neurons(0).Weights(0) = -1.0
+        il.Neurons(0).Weights(1) = -0.6
+
+        inputNeuron2.Ax.Weight = -0.5
+        inputNeuron2.By.Weight = 0.7
+        il.Neurons(1).Weights(0) = -0.5
+        il.Neurons(1).Weights(1) = 0.7
+
+        outputNeuron.Ax.Weight = 0.3
+        outputNeuron.By.Weight = 0.5
+        nl.Neurons(0).Weights(0) = 0.3
+        nl.Neurons(0).Weights(1) = 0.5
+
+        datas.Add({0, 0}) : labels.Add(-0.7)
+        datas.Add({1, 1}) : labels.Add(-0.7)
+        datas.Add({1, 0}) : labels.Add(0.7)
+        datas.Add({0, 1}) : labels.Add(0.7)
+
+        For epoch As Integer = 1 To 5000000
+            index = rnd.Next(datas.Count)
+            input = datas(index)
+
+            inputNeuron1.Clear()
+            inputNeuron2.Clear()
+            outputNeuron.Clear()
+            nn.Clear()
+
+            in1 = inputNeuron1.Forward(input(0), input(1))
+            in2 = inputNeuron2.Forward(input(0), input(1))
+            result = outputNeuron.Forward(in1, in2)
+            resultNN = nn.Forward(input)(0)
+
+            If Math.Round(result, 5) <> Math.Round(resultNN, 5) Then
+                Dim stopHere = 1
+            End If
+
+            err = labels(index) - result
+            outputNeuron.Backward(err)
+            inputNeuron1.Backward(outputNeuron.GradientX)
+            inputNeuron2.Backward(outputNeuron.GradientY)
+
+            err = labels(index) - resultNN
+            nn.Backward({err})
+            nn.UpdateWeights(lr)
+
+            outputNeuron.Update(lr)
+            inputNeuron1.Update(lr)
+            inputNeuron2.Update(lr)
+
+
+            'Assert.AreEqual(outputNeuron.Activation.GradientX.ToString, tf.Gradients(0).ToString)
+
+            'Assert.AreEqual(outputNeuron.Ax.Weight.ToString, nl.Neurons(0).Weights(0).ToString)
+            'Assert.AreEqual(outputNeuron.By.Weight.ToString, nl.Neurons(0).Weights(1).ToString)
+            'Assert.AreEqual(outputNeuron.AxByC.Bias.ToString, nl.Neurons(0).Weights(2).ToString)
+
+            'Assert.AreEqual(outputNeuron.Ax.GradientWeight.ToString, nl.Neurons(0).WeightGradients(0).ToString)
+            'Assert.AreEqual(outputNeuron.By.GradientWeight.ToString, nl.Neurons(0).WeightGradients(1).ToString)
+            'Assert.AreEqual(outputNeuron.AxByC.GradientBias.ToString, nl.Neurons(0).WeightGradients(2).ToString)
+
+            'Assert.AreEqual(outputNeuron.Ax.GradientX.ToString, nl.Neurons(0).InputGradients(0).ToString)
+            'Assert.AreEqual(outputNeuron.By.GradientX.ToString, nl.Neurons(0).InputGradients(1).ToString)
+
+
+
+            'Assert.AreEqual(inputNeuron1.Ax.GradientWeight.ToString, il.Neurons(0).WeightGradients(0).ToString)
+            'Assert.AreEqual(inputNeuron1.By.GradientWeight.ToString, il.Neurons(0).WeightGradients(1).ToString)
+            'Assert.AreEqual(inputNeuron1.AxByC.GradientBias.ToString, il.Neurons(0).WeightGradients(2).ToString)
+
+            'Assert.AreEqual(inputNeuron1.Ax.Weight.ToString, il.Neurons(0).Weights(0).ToString)
+            'Assert.AreEqual(inputNeuron1.By.Weight.ToString, il.Neurons(0).Weights(1).ToString)
+            'Assert.AreEqual(inputNeuron1.AxByC.Bias.ToString, il.Neurons(0).Weights(2).ToString)
+
+
+            'Assert.AreEqual(inputNeuron2.Ax.GradientWeight.ToString, il.Neurons(1).WeightGradients(0).ToString)
+            'Assert.AreEqual(inputNeuron2.By.GradientWeight.ToString, il.Neurons(1).WeightGradients(1).ToString)
+            'Assert.AreEqual(inputNeuron2.AxByC.GradientBias.ToString, il.Neurons(1).WeightGradients(2).ToString)
+
+            'Assert.AreEqual(inputNeuron2.Ax.Weight.ToString, il.Neurons(1).Weights(0).ToString)
+            'Assert.AreEqual(inputNeuron2.By.Weight.ToString, il.Neurons(1).Weights(1).ToString)
+            'Assert.AreEqual(inputNeuron2.AxByC.Bias.ToString, il.Neurons(1).Weights(2).ToString)
+
+            If epoch Mod 100 = 0 Then
+                Dim stopHere = 1
+                err = 0.0
+
+                For Each input In datas
+                    index = datas.IndexOf(input)
+                    in1 = inputNeuron1.Forward(input(0), input(1))
+                    in2 = inputNeuron2.Forward(input(0), input(1))
+                    result = outputNeuron.Forward(in1, in2)
+                    err += 0.5 * (labels(index) - result) * (labels(index) - result)
+                Next
+
+                err = 0.0
+
+
+                For Each input In datas
+                    index = datas.IndexOf(input)
+                    result = nn.Forward(input)(0)
+                    err += 0.5 * (labels(index) - result) * (labels(index) - result)
+                Next
+
+                Console.WriteLine(err)
+                Threading.Thread.Sleep(50)
+            End If
+        Next
+    End Sub
+
+    Public Sub NetworkTestXor()
+        Dim nn As New NeuralNetwork(2)
+        Dim rnd As New Random(23)
+        Dim datas As New List(Of Double())
+        Dim labels As New List(Of Double)
+        Dim index As Integer
+        Dim current, nnResult As Double()
+        Dim result As Double
+        Dim err As Double
+
+        datas.Add({0, 0}) : labels.Add(-0.7)
+        datas.Add({0, 1}) : labels.Add(0.7)
+        datas.Add({1, 0}) : labels.Add(0.7)
+        datas.Add({1, 1}) : labels.Add(-0.7)
+
+        Dim il As InputLayer = nn.AddInputLayer(2)
+        nn.AddTanhLayer()
+        Dim nl As NeuronLayer = CType(nn.AddNeuronLayer(1), NeuronLayer)
+        nn.AddFinalLayer(1, ILayer.LayerTypeE.Tanh)
+        nn.Randomize(rnd)
+        Console.WriteLine()
+
+        il.Neurons(0).Weights(0) = -1.0
+        il.Neurons(0).Weights(0) = -0.6
+
+        il.Neurons(1).Weights(0) = -0.5
+        il.Neurons(1).Weights(0) = 0.7
+
+        nl.Neurons(0).Weights(0) = 0.3
+        nl.Neurons(0).Weights(0) = 0.5
+
+        For i As Integer = 1 To 4000000
+            index = rnd.Next(datas.Count)
+            current = datas(index)
+
+            nn.Clear()
+            nnResult = nn.Forward(current)
+            result = nnResult(0)
+            err = labels(index) - result
+
+
+            nn.Backward({err})
+            nn.UpdateWeights(0.07)
+
+            If i Mod 100 = 0 Then
+                err = 0
+
+                For n As Integer = 0 To datas.Count - 1
+                    current = datas(n)
+                    nnResult = nn.Forward(current)
+                    result = nnResult(0)
+                    err += 0.5 * (labels(index) - result) * (labels(index) - result)
+                Next
+
+                Console.WriteLine(err)
+            End If
+        Next
+    End Sub
+
     Sub Main()
         Dim invest As New InvestMonthlyStrategy
         Dim momentum As New MomentumStrategy
@@ -769,6 +1028,10 @@ Module Program
         Dim loader As New Downloader
         Dim sd As String
         Dim s As Stock
+        NetworkTestSnp()
+        SimpleXorCompareNet()
+        NetworkTestXor()
+        SimpleXor()
         ' ThreeToOne()
         NetworkTestSnp()
         NetworkTest()

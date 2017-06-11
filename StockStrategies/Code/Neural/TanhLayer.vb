@@ -42,13 +42,11 @@
     End Function
 
     Public Sub Backward(adjustInDirection() As Double) Implements ILayer.Backward
-        Dim r(Me.Inputs - 1) As Double
-
         For i As Integer = 0 To Me.Inputs - 1
-            r(i) = Me.Gradients(i) * adjustInDirection(i)
+            Me.Gradients(i) = Me.Gradients(i) * adjustInDirection(i)
         Next
 
-        Me.PreviousLayer.Backward(r)
+        Me.PreviousLayer.Backward(Me.Gradients)
     End Sub
 
     Public Sub UpdateWeights(learningRate As Double) Implements ILayer.UpdateWeights
